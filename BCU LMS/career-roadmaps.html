@@ -1,0 +1,1589 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IT Career Roadmap Hub — BCU LMS</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700;9..40,800&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+/* ── TOKENS ── */
+:root {
+  --bg: #0f1117;
+  --surface: #161a24;
+  --surface2: #1c2130;
+  --card: #1a1f2e;
+  --text: #e8eaf0;
+  --muted: #8b92a8;
+  --border: #232840;
+  --border2: #2a3050;
+  --accent: #7c9ef8;
+  --accent-dim: rgba(124,158,248,.12);
+  --accent-glow: rgba(124,158,248,.25);
+  --radius: 16px;
+  --radius-sm: 10px;
+  --mono: 'JetBrains Mono', monospace;
+  --sans: 'DM Sans', system-ui, sans-serif;
+  --serif: 'DM Serif Display', Georgia, serif;
+  --shadow: 0 8px 40px rgba(0,0,0,.55);
+  --shadow-lg: 0 24px 80px rgba(0,0,0,.7);
+}
+/* ── LIGHT THEME ── */
+[data-theme="light"] {
+  --bg: #f4f6fb;
+  --surface: #ffffff;
+  --surface2: #eef1f8;
+  --card: #ffffff;
+  --text: #1a1f2e;
+  --muted: #6b7280;
+  --border: #dde2ef;
+  --border2: #c8d0e4;
+  --accent: #3b6cf8;
+  --accent-dim: rgba(59,108,248,.10);
+  --accent-glow: rgba(59,108,248,.20);
+  --shadow: 0 8px 40px rgba(0,0,0,.10);
+  --shadow-lg: 0 24px 80px rgba(0,0,0,.15);
+}
+[data-theme="light"] body::before{
+  background-image:linear-gradient(rgba(59,108,248,.04) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(59,108,248,.04) 1px,transparent 1px);
+}
+[data-theme="light"] .topbar{background:rgba(244,246,251,.94)}
+[data-theme="light"] .skill-item{border-bottom-color:rgba(0,0,0,.05)}
+[data-theme="light"] .role-item{border-bottom-color:rgba(0,0,0,.05)}
+[data-theme="light"] .note-card{background:rgba(234,179,8,.07);border-color:rgba(234,179,8,.25);color:rgba(133,101,0,.9)}
+[data-theme="light"] .exam-highlight{background:rgba(59,108,248,.06);border-color:rgba(59,108,248,.25)}
+
+/* ── TOPBAR CAREER TABS ── */
+.cnav-tab{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:0 13px;height:52px;flex-shrink:0;
+  border:none;background:transparent;cursor:pointer;
+  font-family:var(--sans);font-size:12.5px;font-weight:600;
+  color:var(--muted);transition:all .15s;
+  border-bottom:2px solid transparent;
+  white-space:nowrap;
+}
+.cnav-tab:hover{color:var(--text);background:rgba(124,158,248,.07)}
+.cnav-tab.active{color:var(--accent);border-bottom-color:var(--accent);background:rgba(124,158,248,.08)}
+.cnav-tab .cnav-icon{font-size:13px;line-height:1}
+/* Theme toggle button */
+.theme-toggle{
+  display:flex;align-items:center;gap:6px;
+  padding:5px 11px;border:1px solid var(--border2);border-radius:7px;
+  background:var(--surface2);cursor:pointer;
+  font-family:var(--sans);font-size:12px;font-weight:600;color:var(--muted);
+  transition:all .15s;white-space:nowrap;
+}
+.theme-toggle:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;scrollbar-color:var(--border2) transparent}
+body{font-family:var(--sans);background:var(--bg);color:var(--text);line-height:1.65;overflow-x:hidden;min-height:100vh}
+a{color:inherit;text-decoration:none}
+
+/* ── GRID BG ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(rgba(124,158,248,.025) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(124,158,248,.025) 1px,transparent 1px);
+  background-size:48px 48px;
+  transition:opacity .3s;
+}
+
+/* ── TOPBAR ── */
+.topbar{
+  position:sticky;top:0;z-index:100;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:0 0 0 1.5rem;height:52px;
+  background:rgba(15,17,23,.96);backdrop-filter:blur(16px);
+  border-bottom:1px solid var(--border);
+  gap:0;overflow:hidden;
+}
+[data-theme="light"] .topbar{background:rgba(244,246,251,.97)}
+.topbar-left{display:flex;align-items:center;flex:1;min-width:0;height:100%;overflow:hidden}
+.topbar-right{display:flex;align-items:center;gap:8px;padding:0 1rem;flex-shrink:0}
+.brand{display:flex;align-items:center;gap:9px;flex-shrink:0}
+.brand-logo{
+  width:30px;height:30px;border-radius:7px;background:var(--accent);
+  display:flex;align-items:center;justify-content:center;
+  font-size:9px;font-weight:800;color:#0d0f14;letter-spacing:.5px;flex-shrink:0
+}
+.brand-text{font-size:12.5px;font-weight:600;color:var(--text);white-space:nowrap}
+.brand-text span{color:var(--muted);font-weight:400}
+.topbar-divider{width:1px;height:22px;background:var(--border);margin:0 12px;flex-shrink:0}
+.topbar-tabs{
+  display:flex;align-items:center;height:100%;
+  overflow-x:auto;overflow-y:hidden;
+  scrollbar-width:none;-ms-overflow-style:none;
+  flex:1;min-width:0;
+}
+.topbar-tabs::-webkit-scrollbar{display:none}
+.topbar-back{
+  display:inline-flex;align-items:center;gap:5px;
+  padding:6px 12px;border:1px solid var(--border2);border-radius:7px;
+  font-size:12px;font-weight:600;color:var(--muted);
+  background:var(--surface);transition:all .15s;cursor:pointer;white-space:nowrap;
+}
+.topbar-back:hover{color:var(--text);border-color:var(--accent);background:var(--accent-dim)}
+.topbar-back svg{flex-shrink:0}
+
+/* ── HERO ── */
+.hero{
+  position:relative;z-index:1;
+  max-width:1160px;margin:0 auto;padding:56px 2rem 36px
+}
+.hero-eyebrow{
+  display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:11px;font-weight:600;
+  color:var(--accent);letter-spacing:1.5px;text-transform:uppercase;
+  background:var(--accent-dim);border:1px solid var(--accent-glow);
+  padding:5px 12px;border-radius:999px;margin-bottom:20px
+}
+.hero h1{
+  font-family:var(--serif);font-size:clamp(36px,5.5vw,68px);
+  line-height:.95;color:var(--text);font-weight:400;
+  margin-bottom:16px
+}
+.hero h1 em{font-style:italic;color:var(--accent)}
+.hero-lead{font-size:17px;color:var(--muted);max-width:680px;line-height:1.7;margin-bottom:32px}
+.hero-stats{display:flex;gap:24px;flex-wrap:wrap}
+.hero-stat{text-align:left}
+.hero-stat strong{display:block;font-family:var(--serif);font-size:32px;color:var(--text);line-height:1}
+.hero-stat span{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.5px;text-transform:uppercase}
+
+
+.sbtn-icon{
+  width:34px;height:34px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;flex-shrink:0;
+  background:var(--surface2);
+}
+
+/* ── ROADMAP DETAIL PANEL ── */
+.roadmap-section{
+  position:relative;z-index:1;
+  max-width:1160px;margin:0 auto;padding:0 2rem 80px
+}
+.rdm-panel{
+  border:1px solid var(--border);border-radius:20px;
+  background:var(--surface);overflow:hidden;
+  transition:all .35s ease;animation:fadeUp .4s both
+}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:none}}
+
+/* ── PANEL HEADER ── */
+.rdm-header{
+  padding:32px 32px 24px;
+  border-bottom:1px solid var(--border);
+  display:grid;grid-template-columns:1fr auto;gap:20px;align-items:start
+}
+.rdm-tag{
+  font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);
+  background:var(--accent-dim);border:1px solid var(--accent-glow);
+  padding:4px 10px;border-radius:999px;letter-spacing:.5px;
+  display:inline-block;margin-bottom:12px
+}
+.rdm-title{
+  font-family:var(--serif);font-size:clamp(26px,3.5vw,42px);
+  color:var(--text);font-weight:400;line-height:1;margin-bottom:10px
+}
+.rdm-desc{font-size:15px;color:var(--muted);max-width:620px;line-height:1.7}
+.rdm-meta{text-align:right}
+.rdm-icon{font-size:52px;display:block;margin-bottom:6px}
+.rdm-duration{font-size:12px;font-weight:700;color:var(--muted);letter-spacing:.5px}
+
+/* ── PROGRESS BAR ── */
+.rdm-progress{
+  padding:20px 32px;background:var(--surface2);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:16px
+}
+.progress-label{font-size:12px;font-weight:700;color:var(--muted);white-space:nowrap}
+.progress-track{
+  flex:1;height:5px;background:var(--border);border-radius:999px;overflow:hidden
+}
+.progress-fill{height:100%;background:var(--accent);border-radius:999px;transition:width .6s ease}
+.progress-pct{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:600;white-space:nowrap}
+
+/* ── MILESTONE TRACK ── */
+.milestone-section{padding:28px 32px;border-bottom:1px solid var(--border)}
+.section-heading{
+  font-size:11px;font-weight:800;color:var(--muted);letter-spacing:1.5px;
+  text-transform:uppercase;margin-bottom:18px;
+  display:flex;align-items:center;gap:8px
+}
+.section-heading::after{content:'';flex:1;height:1px;background:var(--border)}
+.milestone-track{display:flex;align-items:center;gap:0;overflow-x:auto;padding-bottom:4px}
+.ms-node{
+  display:flex;flex-direction:column;align-items:center;
+  gap:8px;min-width:100px;flex:1;position:relative
+}
+.ms-node::after{
+  content:'';position:absolute;top:20px;left:50%;right:-50%;
+  height:2px;background:var(--border2);z-index:0
+}
+.ms-node:last-child::after{display:none}
+.ms-circle{
+  width:40px;height:40px;border-radius:50%;
+  background:var(--surface2);border:2px solid var(--border2);
+  display:flex;align-items:center;justify-content:center;
+  font-size:18px;z-index:1;position:relative;transition:all .3s
+}
+.ms-node.done .ms-circle{border-color:var(--accent);background:var(--accent-dim)}
+.ms-node.active .ms-circle{
+  border-color:var(--accent);background:var(--accent);
+  box-shadow:0 0 16px var(--accent-glow)
+}
+.ms-label{font-size:11.5px;font-weight:700;color:var(--text);text-align:center;line-height:1.3}
+.ms-sub{font-size:10px;color:var(--muted);text-align:center;font-family:var(--mono)}
+
+/* ── PHASES GRID ── */
+.phases-section{padding:28px 32px;border-bottom:1px solid var(--border)}
+.phases-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.phase-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius);padding:18px;transition:border-color .2s
+}
+.phase-card:hover{border-color:var(--border2)}
+.phase-num{
+  font-family:var(--mono);font-size:10px;font-weight:600;color:var(--accent);
+  letter-spacing:1px;text-transform:uppercase;margin-bottom:6px
+}
+.phase-title{font-size:14px;font-weight:800;color:var(--text);margin-bottom:4px}
+.phase-timeline{font-size:11px;color:var(--muted);margin-bottom:12px;font-family:var(--mono)}
+.skill-list{list-style:none}
+.skill-item{
+  display:flex;align-items:flex-start;gap:8px;
+  font-size:12.5px;color:var(--muted);padding:4px 0;
+  border-bottom:1px solid rgba(255,255,255,.04)
+}
+.skill-item:last-child{border-bottom:none}
+.skill-dot{
+  width:6px;height:6px;border-radius:50%;flex-shrink:0;margin-top:5px;
+  background:var(--border2)
+}
+.skill-item.done .skill-dot{background:var(--accent)}
+.skill-item.done .skill-text{color:var(--text)}
+.skill-item.active .skill-dot{
+  background:var(--accent);
+  box-shadow:0 0 6px var(--accent-glow)
+}
+.skill-item.active .skill-text{color:var(--text)}
+.skill-text{flex:1;line-height:1.45}
+
+/* ── BOTTOM PANELS ── */
+.bottom-grid{
+  display:grid;grid-template-columns:1.1fr .9fr;
+  gap:14px;padding:28px 32px 24px
+}
+.info-panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:20px}
+.info-title{font-size:13px;font-weight:800;color:var(--text);margin-bottom:14px}
+.chips{display:flex;flex-wrap:wrap;gap:7px}
+.chip{
+  padding:5px 10px;border:1px solid var(--border2);border-radius:999px;
+  font-size:11.5px;font-weight:700;color:var(--muted);background:var(--surface2)
+}
+.role-list{list-style:none}
+.role-item{
+  display:flex;align-items:center;gap:8px;
+  padding:7px 0;border-bottom:1px solid rgba(255,255,255,.04);
+  font-size:13px;color:var(--text)
+}
+.role-item:last-child{border-bottom:none}
+.role-arrow{font-size:10px;color:var(--accent)}
+
+/* ── EXAMS PANEL ── */
+.exams-section{padding:0 32px 28px}
+.exam-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:10px}
+.exam-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--radius-sm);padding:16px;transition:border-color .2s
+}
+.exam-card:hover{border-color:var(--border2)}
+.exam-badge{
+  font-family:var(--mono);font-size:10px;font-weight:700;
+  color:var(--accent);background:var(--accent-dim);
+  border:1px solid var(--accent-glow);
+  padding:3px 8px;border-radius:6px;display:inline-block;margin-bottom:8px;letter-spacing:.5px
+}
+.exam-name{font-size:13px;font-weight:800;color:var(--text);margin-bottom:4px}
+.exam-by{font-size:11px;color:var(--muted);margin-bottom:8px}
+.exam-details{font-size:11.5px;color:var(--muted);line-height:1.6}
+.exam-details strong{color:var(--text)}
+
+/* ── NOTE CARD ── */
+.note-card{
+  margin:0 32px 20px;padding:14px 16px;
+  background:rgba(234,179,8,.06);border:1px solid rgba(234,179,8,.18);
+  border-radius:var(--radius-sm);font-size:13px;color:rgba(234,179,8,.85)
+}
+
+/* ── RESOURCES ── */
+.resources-row{
+  display:flex;flex-wrap:wrap;gap:8px;padding:0 32px 28px
+}
+.res-link{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:7px 12px;border:1px solid var(--border2);border-radius:8px;
+  font-size:12px;font-weight:600;color:var(--muted);background:var(--surface2);
+  transition:all .15s;cursor:pointer
+}
+.res-link:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-dim)}
+.res-link svg{flex-shrink:0}
+
+/* ── ACADEMIC STREAM EXTRAS ── */
+.exam-highlight{
+  border-color:rgba(124,158,248,.35);
+  background:rgba(124,158,248,.05)
+}
+.exam-highlight .exam-badge{
+  color:#a78bfa;background:rgba(167,139,250,.12);border-color:rgba(167,139,250,.3)
+}
+.exam-highlight .exam-name{color:#c4b5fd}
+
+
+
+
+
+/* ── SPLIT BUTTON ── */
+.split-btn-wrap{
+  position:relative;display:inline-flex;align-items:stretch;
+  border-radius:10px;overflow:visible;
+}
+.split-main{
+  display:inline-flex;align-items:center;gap:9px;
+  padding:9px 16px;
+  background:var(--surface);border:1px solid var(--border2);
+  border-right:none;border-radius:10px 0 0 10px;
+  font-family:var(--sans);font-size:13px;font-weight:700;
+  color:var(--text);cursor:pointer;transition:all .15s;
+  white-space:nowrap;
+}
+.split-main:hover{background:var(--surface2);border-color:var(--accent)}
+.split-main #split-icon{font-size:16px;line-height:1}
+.split-chevron{
+  display:inline-flex;align-items:center;justify-content:center;
+  width:36px;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:0 10px 10px 0;
+  cursor:pointer;transition:all .15s;color:var(--muted);
+}
+.split-chevron:hover{background:var(--surface2);border-color:var(--accent);color:var(--accent)}
+.split-btn-wrap.open .split-chevron{
+  background:var(--accent-dim);border-color:var(--accent);color:var(--accent)
+}
+.split-btn-wrap.open #split-chevron-svg{transform:rotate(180deg)}
+#split-chevron-svg{transition:transform .2s ease}
+
+/* ── DROPDOWN MENU ── */
+.split-dropdown{
+  display:none;position:absolute;top:calc(100% + 8px);left:0;
+  min-width:280px;
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:12px;box-shadow:var(--shadow-lg);
+  z-index:500;overflow:hidden;
+  animation:dropIn .15s ease both
+}
+@keyframes dropIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.split-btn-wrap.open .split-dropdown{display:block}
+.dropdown-header{
+  padding:10px 14px 8px;
+  font-size:10px;font-weight:800;color:var(--muted);
+  letter-spacing:1.2px;text-transform:uppercase;
+  border-bottom:1px solid var(--border)
+}
+.dropdown-list{
+  max-height:360px;overflow-y:auto;
+  scrollbar-width:thin;scrollbar-color:var(--border2) transparent
+}
+.dd-item{
+  width:100%;display:flex;align-items:center;gap:10px;
+  padding:10px 14px;border:none;background:transparent;
+  cursor:pointer;font-family:var(--sans);text-align:left;
+  transition:background .12s;
+}
+.dd-item:hover{background:var(--surface2)}
+.dd-item.active{background:var(--accent-dim)}
+.dd-icon{font-size:18px;flex-shrink:0;width:24px;text-align:center}
+.dd-text{flex:1;display:flex;flex-direction:column;gap:1px;min-width:0}
+.dd-name{font-size:13px;font-weight:700;color:var(--text);line-height:1.2}
+.dd-dur{font-size:10.5px;color:var(--muted);font-family:var(--mono)}
+.dd-check{
+  font-size:12px;color:var(--accent);flex-shrink:0;
+  opacity:0;transition:opacity .1s
+}
+.dd-item.active .dd-check{opacity:1}
+.dd-item.active .dd-name{color:var(--accent)}
+
+/* ── HERO SPECIALIZATION ROW ── */
+.hero{padding-bottom:40px}
+.hero-spec-row{
+  display:flex;align-items:center;gap:16px;
+  margin-top:28px;flex-wrap:wrap;
+}
+.hero-spec-label{
+  font-size:11px;font-weight:800;color:var(--muted);
+  letter-spacing:1.5px;text-transform:uppercase;white-space:nowrap;
+}
+
+/* ── FOOTER ── */
+.footer{
+  position:relative;z-index:1;
+  text-align:center;padding:40px 2rem;
+  border-top:1px solid var(--border);
+  color:var(--muted);font-size:12.5px
+}
+.footer a{color:var(--accent)}
+
+/* ── RESPONSIVE ── */
+@media(max-width:840px){
+  .rdm-header{grid-template-columns:1fr}
+  .rdm-meta{display:flex;align-items:center;gap:12px;justify-content:flex-start}
+  .rdm-icon{font-size:36px;margin-bottom:0}
+  .bottom-grid{grid-template-columns:1fr}
+  .rdm-header,.milestone-section,.phases-section,.bottom-grid,.exams-section,.resources-row,.exams-section,.note-card,.rdm-progress{
+    padding-left:20px;padding-right:20px
+  }
+}
+@media(max-width:560px){
+  .hero{padding:36px 1.2rem 24px}
+  .roadmap-section{padding-left:1.2rem;padding-right:1.2rem}
+  .phases-grid{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR with embedded career tabs -->
+<nav class="topbar">
+  <div class="topbar-left">
+    <div class="brand">
+      <div class="brand-logo">BCU</div>
+      <div class="brand-text">LMS <span>/ Career Hub</span></div>
+    </div>
+    <div class="topbar-divider"></div>
+    <div class="topbar-tabs" id="topbar-tabs">
+      <button class="cnav-tab active" data-stream="datascience" onclick="navSelect('datascience',this)"><span class="cnav-icon">📊</span>Data Science</button>
+      <button class="cnav-tab" data-stream="aiml" onclick="navSelect('aiml',this)"><span class="cnav-icon">🤖</span>AI / ML</button>
+      <button class="cnav-tab" data-stream="webdev" onclick="navSelect('webdev',this)"><span class="cnav-icon">🌐</span>Full Stack</button>
+      <button class="cnav-tab" data-stream="devops" onclick="navSelect('devops',this)"><span class="cnav-icon">⚙️</span>DevOps</button>
+      <button class="cnav-tab" data-stream="cloud" onclick="navSelect('cloud',this)"><span class="cnav-icon">☁️</span>Cloud</button>
+      <button class="cnav-tab" data-stream="cybersec" onclick="navSelect('cybersec',this)"><span class="cnav-icon">🔐</span>Cyber Security</button>
+      <button class="cnav-tab" data-stream="ethicalhacking" onclick="navSelect('ethicalhacking',this)"><span class="cnav-icon">🛡️</span>Ethical Hacking</button>
+      <button class="cnav-tab" data-stream="dataeng" onclick="navSelect('dataeng',this)"><span class="cnav-icon">🏗️</span>Data Engineering</button>
+      <button class="cnav-tab" data-stream="mobile" onclick="navSelect('mobile',this)"><span class="cnav-icon">📱</span>Mobile Dev</button>
+      <button class="cnav-tab" data-stream="blockchain" onclick="navSelect('blockchain',this)"><span class="cnav-icon">⛓️</span>Blockchain</button>
+      <button class="cnav-tab" data-stream="uiux" onclick="navSelect('uiux',this)"><span class="cnav-icon">🎨</span>UI/UX</button>
+      <button class="cnav-tab" data-stream="academic" onclick="navSelect('academic',this)"><span class="cnav-icon">🎓</span>Academic</button>
+    </div>
+  </div>
+  <div class="topbar-right">
+    <button class="theme-toggle" id="theme-toggle-btn" onclick="toggleTheme()">
+      <span id="theme-icon">☀️</span>
+      <span id="theme-label">Light</span>
+    </button>
+    <a class="topbar-back" href="Dashboard_v5.html">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back
+    </a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<header class="hero">
+  <div class="hero-eyebrow">
+    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+    BCU LMS · IT Career Roadmap Hub
+  </div>
+  <h1>Every path into <em>IT,</em><br>mapped for you</h1>
+  <p class="hero-lead">Detailed, stage-by-stage roadmaps for 12 IT career streams — from first principles to job-ready. Includes tools, certifications, capstone projects, and competitive examinations.</p>
+  <div class="hero-stats">
+    <div class="hero-stat"><strong>12</strong><span>Career Streams</span></div>
+    <div class="hero-stat"><strong>60+</strong><span>Exam & Cert Details</span></div>
+    <div class="hero-stat"><strong>100+</strong><span>Skills Mapped</span></div>
+  </div>
+
+  <!-- SPECIALIZATION SPLIT BUTTON — lives in hero -->
+  <div class="hero-spec-row">
+    <span class="hero-spec-label">SPECIALIZATION</span>
+    <div class="split-btn-wrap" id="split-btn-wrap">
+      <button class="split-main" id="split-main" onclick="splitMainClick()">
+        <span id="split-icon">📊</span>
+        <span id="split-label">Data Science</span>
+      </button>
+      <button class="split-chevron" id="split-chevron" onclick="toggleDropdown(event)" aria-label="Choose specialization">
+        <svg id="split-chevron-svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+      </button>
+      <div class="split-dropdown" id="split-dropdown">
+        <div class="dropdown-header">Choose your career path</div>
+        <div class="dropdown-list">
+          <button class="dd-item active" data-key="datascience" onclick="selectFromDropdown('datascience')"><span class="dd-icon">📊</span><span class="dd-text"><span class="dd-name">Data Science</span><span class="dd-dur">15–24 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="aiml" onclick="selectFromDropdown('aiml')"><span class="dd-icon">🤖</span><span class="dd-text"><span class="dd-name">AI / ML</span><span class="dd-dur">15–24 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="webdev" onclick="selectFromDropdown('webdev')"><span class="dd-icon">🌐</span><span class="dd-text"><span class="dd-name">Full Stack Web</span><span class="dd-dur">12–18 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="devops" onclick="selectFromDropdown('devops')"><span class="dd-icon">⚙️</span><span class="dd-text"><span class="dd-name">DevOps</span><span class="dd-dur">12–18 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="cloud" onclick="selectFromDropdown('cloud')"><span class="dd-icon">☁️</span><span class="dd-text"><span class="dd-name">Cloud Engineering</span><span class="dd-dur">12–18 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="cybersec" onclick="selectFromDropdown('cybersec')"><span class="dd-icon">🔐</span><span class="dd-text"><span class="dd-name">Cyber Security</span><span class="dd-dur">15–24 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="ethicalhacking" onclick="selectFromDropdown('ethicalhacking')"><span class="dd-icon">🛡️</span><span class="dd-text"><span class="dd-name">Ethical Hacking</span><span class="dd-dur">12–18 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="dataeng" onclick="selectFromDropdown('dataeng')"><span class="dd-icon">🏗️</span><span class="dd-text"><span class="dd-name">Data Engineering</span><span class="dd-dur">15–20 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="mobile" onclick="selectFromDropdown('mobile')"><span class="dd-icon">📱</span><span class="dd-text"><span class="dd-name">Mobile Dev</span><span class="dd-dur">10–16 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="blockchain" onclick="selectFromDropdown('blockchain')"><span class="dd-icon">⛓️</span><span class="dd-text"><span class="dd-name">Blockchain</span><span class="dd-dur">12–18 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="uiux" onclick="selectFromDropdown('uiux')"><span class="dd-icon">🎨</span><span class="dd-text"><span class="dd-name">UI/UX Design</span><span class="dd-dur">10–16 months</span></span><span class="dd-check">✓</span></button>
+          <button class="dd-item" data-key="academic" onclick="selectFromDropdown('academic')"><span class="dd-icon">🎓</span><span class="dd-text"><span class="dd-name">Lecturer / Academic</span><span class="dd-dur">24–36 months</span></span><span class="dd-check">✓</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>
+
+<!-- ROADMAP DETAIL PANEL -->
+<section class="roadmap-section">
+  <div id="rdm-panel" class="rdm-panel">
+    <!-- Rendered by JS -->
+  </div>
+</section>
+
+<footer class="footer">
+  BCU LMS · Career Roadmap Hub · Built for <a href="Dashboard_v5.html">BCU Learners</a>
+  <br><span style="font-size:11px;margin-top:4px;display:block">All roadmaps are guidelines. Adapt timelines to your pace and prior knowledge.</span>
+</footer>
+
+<script>
+/* ══════════════════════════════════════════
+   ROADMAP DATA
+══════════════════════════════════════════ */
+const STREAMS = {
+
+  datascience: {
+    icon:'📊', name:'Career in Data Science', tag:'15–24 months',
+    duration:'15–24 months', progress:18,
+    desc:'From Python and statistics into machine learning, deep learning, NLP, Generative AI, and deployable analytics portfolios.',
+    milestones:[
+      {e:'🐍',label:'Python & SQL solid',sub:'Month 3',state:'done'},
+      {e:'📈',label:'BI dashboard live',sub:'Month 7',state:'done'},
+      {e:'🧠',label:'ML model deployed',sub:'Month 14',state:'active'},
+      {e:'🤖',label:'GenAI project',sub:'Month 20',state:''},
+      {e:'💼',label:'Data role ready',sub:'Month 24',state:''},
+    ],
+    phases:[
+      {num:'Phase 01',title:'Common Foundation',timeline:'Months 0–3',skills:[
+        {name:'Python programming, Git, Linux basics, VS Code',s:'done'},
+        {name:'SQL — joins, groups, subqueries, window functions',s:'done'},
+        {name:'Statistics, probability, and linear algebra intuition',s:'active'},
+        {name:'Logic building, DSA basics, and clean documentation',s:''},
+      ]},
+      {num:'Phase 02',title:'Data Analysis & BI',timeline:'Months 4–7',skills:[
+        {name:'NumPy, Pandas, Matplotlib, and Seaborn',s:''},
+        {name:'Data cleaning, EDA, and storytelling notebooks',s:''},
+        {name:'Power BI or Tableau dashboards for reporting',s:''},
+        {name:'Excel advanced functions and pivot tables',s:''},
+      ]},
+      {num:'Phase 03',title:'Machine Learning',timeline:'Months 8–12',skills:[
+        {name:'Regression, classification, clustering, and metrics',s:''},
+        {name:'Scikit-Learn pipelines and feature engineering',s:''},
+        {name:'Model validation, cross-validation, and bias checks',s:''},
+        {name:'Project: predictor, recommender, or churn model',s:''},
+      ]},
+      {num:'Phase 04',title:'Deep Learning & GenAI',timeline:'Months 13–18',skills:[
+        {name:'TensorFlow or PyTorch — neural networks basics',s:''},
+        {name:'NLP, transformers, and pre-trained LLM APIs',s:''},
+        {name:'Generative AI, RAG, and responsible AI workflow',s:''},
+        {name:'Deploy models via Streamlit, Flask, or FastAPI',s:''},
+      ]},
+      {num:'Phase 05',title:'MLOps & Career',timeline:'Months 19–24',skills:[
+        {name:'MLflow, Weights & Biases for experiment tracking',s:''},
+        {name:'Model versioning, monitoring, and cloud deployment',s:''},
+        {name:'Build 3–5 polished GitHub projects with live demos',s:''},
+        {name:'Prepare for Data Scientist and ML Engineer interviews',s:''},
+      ]},
+    ],
+    tools:['Python','SQL','NumPy','Pandas','Matplotlib','Scikit-Learn','TensorFlow','PyTorch','Power BI','Tableau','Streamlit','MLflow'],
+    roles:['Data Scientist','Machine Learning Engineer','AI Engineer','BI Analyst','Research Scientist'],
+    projects:['Placement analytics dashboard','Sales forecasting model','Student feedback sentiment tool','Churn prediction model','Deployed ML web application'],
+    exams:[
+      {badge:'CERT',name:'Google Data Analytics',by:'Google / Coursera',highlight:false,
+       details:'<strong>Duration:</strong> ~6 months self-paced<br><strong>Cost:</strong> ~₹3,000/month<br><strong>Covers:</strong> SQL, Tableau, R, data cleaning'},
+      {badge:'CERT',name:'IBM Data Science Professional',by:'IBM / Coursera',highlight:false,
+       details:'<strong>Duration:</strong> 10 courses, ~4 months<br><strong>Covers:</strong> Python, ML, SQL, Capstone project'},
+      {badge:'EXAM',name:'AWS Certified ML Specialty',by:'Amazon Web Services',highlight:false,
+       details:'<strong>Cost:</strong> ₹24,000 (USD 300)<br><strong>Format:</strong> 65 MCQs, 180 min<br><strong>Focus:</strong> ML on AWS, modeling, deployment'},
+      {badge:'CERT',name:'Kaggle Certifications',by:'Kaggle',highlight:false,
+       details:'<strong>Cost:</strong> Free<br><strong>Covers:</strong> Python, ML, Deep Learning, SQL, Pandas, LLMs'},
+    ],
+    note:null,
+    resources:[
+      {label:'Kaggle Learn',url:'https://www.kaggle.com/learn'},
+      {label:'Scikit-Learn Docs',url:'https://scikit-learn.org'},
+      {label:'DeepLearning.AI',url:'https://www.deeplearning.ai'},
+      {label:'roadmap.sh/ai-data-scientist',url:'https://roadmap.sh/ai-data-scientist'},
+    ]
+  },
+
+  aiml: {
+    icon:'🤖', name:'AI / ML Engineer', tag:'15–24 months',
+    duration:'15–24 months', progress:12,
+    desc:'Build intelligent systems using Python, math, machine learning, deep learning, Generative AI, LLMs, RAG pipelines, and AI agents.',
+    milestones:[
+      {e:'🐍',label:'Python & Math',sub:'Month 3',state:'done'},
+      {e:'🔬',label:'First ML model',sub:'Month 8',state:'active'},
+      {e:'🧠',label:'Deep learning project',sub:'Month 14',state:''},
+      {e:'🤖',label:'LLM / RAG app',sub:'Month 20',state:''},
+      {e:'🏆',label:'AI internship',sub:'Month 24',state:''},
+    ],
+    phases:[
+      {num:'Stage 01',title:'Python, Math & Statistics',timeline:'Months 1–3',skills:[
+        {name:'Python — NumPy, Pandas, Matplotlib, Jupyter',s:'done'},
+        {name:'Linear algebra, probability, and descriptive statistics',s:'active'},
+        {name:'Hypothesis testing, calculus intuition for ML',s:''},
+        {name:'EDA project with insight report',s:''},
+      ]},
+      {num:'Stage 02',title:'Machine Learning',timeline:'Months 4–8',skills:[
+        {name:'Regression, classification, clustering, anomaly detection',s:''},
+        {name:'Feature engineering, cross-validation, and bias checks',s:''},
+        {name:'Scikit-Learn pipelines with real datasets',s:''},
+        {name:'Project: spam classifier or student predictor',s:''},
+      ]},
+      {num:'Stage 03',title:'Deep Learning Domains',timeline:'Months 9–14',skills:[
+        {name:'Neural networks, CNNs, transfer learning, RNNs',s:''},
+        {name:'Transformers, BERT, ViT and model fine-tuning',s:''},
+        {name:'NLP, computer vision, and dataset preparation',s:''},
+        {name:'Project: face attendance, plant disease, sentiment dashboard',s:''},
+      ]},
+      {num:'Stage 04',title:'Generative AI & Production',timeline:'Months 15–24',skills:[
+        {name:'LLMs, prompt engineering, embeddings, vector DBs',s:''},
+        {name:'RAG pipelines, LangChain, and AI agents',s:''},
+        {name:'Hugging Face, FastAPI, Streamlit, MLflow',s:''},
+        {name:'Project: college chatbot or document Q&A assistant',s:''},
+      ]},
+    ],
+    tools:['Python','Jupyter','Scikit-Learn','TensorFlow','PyTorch','OpenCV','Hugging Face','LangChain','FastAPI','Streamlit','MLflow','Weights & Biases'],
+    roles:['AI Engineer','ML Engineer','GenAI Engineer','Prompt Engineer','AI Product Intern'],
+    projects:['Student performance predictor','Face recognition attendance system','College admission chatbot','Plant disease detector','Document Q&A assistant with RAG'],
+    exams:[
+      {badge:'CERT',name:'TensorFlow Developer Certificate',by:'Google',highlight:false,
+       details:'<strong>Cost:</strong> USD 100 (~₹8,300)<br><strong>Format:</strong> 5-hour coding exam<br><strong>Covers:</strong> TF, CNNs, NLP, sequences'},
+      {badge:'CERT',name:'AWS ML Specialty',by:'Amazon Web Services',highlight:false,
+       details:'<strong>Cost:</strong> USD 300 (~₹24,900)<br><strong>Format:</strong> 65 MCQs, 180 min<br><strong>Focus:</strong> ML on AWS, deployment'},
+      {badge:'CERT',name:'Deep Learning Specialization',by:'Andrew Ng / Coursera',highlight:false,
+       details:'<strong>Cost:</strong> ~₹3,000/month<br><strong>Courses:</strong> 5 courses<br><strong>Covers:</strong> DL, CNNs, RNNs, transformers'},
+      {badge:'CERT',name:'Hugging Face Course',by:'Hugging Face',highlight:false,
+       details:'<strong>Cost:</strong> Free<br><strong>Covers:</strong> Transformers, NLP, diffusion models, LLMs'},
+    ],
+    note:null,
+    resources:[
+      {label:'fast.ai',url:'https://www.fast.ai'},
+      {label:'Kaggle Learn',url:'https://www.kaggle.com/learn'},
+      {label:'DeepLearning.AI',url:'https://www.deeplearning.ai'},
+      {label:'Papers With Code',url:'https://paperswithcode.com'},
+    ]
+  },
+
+  webdev: {
+    icon:'🌐', name:'Full-Stack Web Developer', tag:'12–18 months',
+    duration:'12–18 months', progress:35,
+    desc:'Build responsive websites and dynamic web apps using HTML, CSS, JavaScript, React, Node.js, databases, and cloud deployment.',
+    milestones:[
+      {e:'🖥️',label:'HTML/CSS/JS done',sub:'Month 2',state:'done'},
+      {e:'⚛️',label:'React app live',sub:'Month 5',state:'done'},
+      {e:'🔗',label:'First REST API',sub:'Month 8',state:'active'},
+      {e:'🗄️',label:'Full-stack app deployed',sub:'Month 12',state:''},
+      {e:'💼',label:'Internship ready',sub:'Month 15',state:''},
+    ],
+    phases:[
+      {num:'Phase 01',title:'Web Foundations',timeline:'Months 1–2',skills:[
+        {name:'HTML5 — semantic structure and accessibility',s:'done'},
+        {name:'CSS3 — Flexbox, Grid, animations, responsive design',s:'done'},
+        {name:'JavaScript ES6+ — DOM, events, fetch API',s:'active'},
+        {name:'Git & GitHub — branching, pull requests',s:'done'},
+      ]},
+      {num:'Phase 02',title:'Frontend Development',timeline:'Months 3–6',skills:[
+        {name:'React.js — components, hooks, context, routing',s:''},
+        {name:'Tailwind CSS or styled-components',s:''},
+        {name:'TypeScript fundamentals',s:''},
+        {name:'Testing with Jest and React Testing Library',s:''},
+      ]},
+      {num:'Phase 03',title:'Backend & Database',timeline:'Months 7–10',skills:[
+        {name:'Node.js & Express.js — REST API design',s:''},
+        {name:'JWT authentication, OAuth, and middleware',s:''},
+        {name:'SQL — MySQL / PostgreSQL and ORM (Prisma)',s:''},
+        {name:'MongoDB and NoSQL design patterns',s:''},
+      ]},
+      {num:'Phase 04',title:'Deploy & Scale',timeline:'Months 11–18',skills:[
+        {name:'Docker basics and container deployment',s:''},
+        {name:'CI/CD with GitHub Actions',s:''},
+        {name:'Cloud hosting — Vercel, Render, AWS',s:''},
+        {name:'System design basics and interview prep',s:''},
+      ]},
+    ],
+    tools:['HTML5','CSS3','JavaScript','TypeScript','React','Next.js','Node.js','Express','PostgreSQL','MongoDB','Docker','GitHub Actions'],
+    roles:['Frontend Developer','Backend Developer','Full-Stack Developer','React Developer','Node.js Developer'],
+    projects:['Personal portfolio','E-commerce platform','Real-time chat app (Socket.IO)','Blog CMS with auth','Job board with filters'],
+    exams:[
+      {badge:'CERT',name:'Meta Front-End Developer',by:'Meta / Coursera',highlight:false,
+       details:'<strong>Duration:</strong> ~7 months<br><strong>Cost:</strong> ~₹3,000/month<br><strong>Covers:</strong> HTML, CSS, React, UI/UX basics'},
+      {badge:'CERT',name:'Meta Back-End Developer',by:'Meta / Coursera',highlight:false,
+       details:'<strong>Duration:</strong> ~8 months<br><strong>Covers:</strong> Python, Django, MySQL, APIs, deployment'},
+      {badge:'EXAM',name:'AWS Developer Associate',by:'Amazon Web Services',highlight:false,
+       details:'<strong>Cost:</strong> USD 150 (~₹12,500)<br><strong>Format:</strong> 65 MCQs, 130 min<br><strong>Focus:</strong> Deploying web apps on AWS'},
+      {badge:'CERT',name:'freeCodeCamp Certifications',by:'freeCodeCamp',highlight:false,
+       details:'<strong>Cost:</strong> Free<br><strong>Tracks:</strong> Responsive Web, JS Algorithms, Back End Dev, Quality Assurance'},
+    ],
+    note:null,
+    resources:[
+      {label:'MDN Web Docs',url:'https://developer.mozilla.org'},
+      {label:'The Odin Project',url:'https://www.theodinproject.com'},
+      {label:'freeCodeCamp',url:'https://www.freecodecamp.org'},
+      {label:'roadmap.sh/frontend',url:'https://roadmap.sh/frontend'},
+    ]
+  },
+
+  devops: {
+    icon:'⚙️', name:'Career in DevOps', tag:'12–18 months',
+    duration:'12–18 months', progress:10,
+    desc:'Learn Linux, networking, Git, Docker, Kubernetes, CI/CD pipelines, Terraform, cloud platforms, and reliability engineering from the ground up.',
+    milestones:[
+      {e:'🐧',label:'Linux & Git fluent',sub:'Month 3',state:'done'},
+      {e:'🐳',label:'Docker app live',sub:'Month 6',state:'active'},
+      {e:'☁️',label:'IaC cloud deploy',sub:'Month 11',state:''},
+      {e:'☸️',label:'K8s cluster running',sub:'Month 15',state:''},
+      {e:'🚀',label:'DevOps role ready',sub:'Month 18',state:''},
+    ],
+    phases:[
+      {num:'Phase 01',title:'Linux, Networking & Git',timeline:'Months 1–3',skills:[
+        {name:'Linux CLI — permissions, processes, logs, cron',s:'done'},
+        {name:'TCP/IP, DNS, HTTP/S, SSH, firewalls, load balancing',s:'active'},
+        {name:'Git & GitHub — branching, pull requests, releases',s:'done'},
+        {name:'Bash scripting for automation and server tasks',s:''},
+      ]},
+      {num:'Phase 02',title:'Containers & CI/CD',timeline:'Months 4–7',skills:[
+        {name:'Docker images, volumes, networks, and Compose',s:''},
+        {name:'Jenkins or GitHub Actions — build, test, deploy',s:''},
+        {name:'Container security, scanning, and best practices',s:''},
+        {name:'Project: containerised Flask or Node app + pipeline',s:''},
+      ]},
+      {num:'Phase 03',title:'Cloud & Infrastructure as Code',timeline:'Months 8–12',skills:[
+        {name:'AWS, Azure, or GCP — compute, storage, IAM, networking',s:''},
+        {name:'Terraform for infrastructure as code',s:''},
+        {name:'Ansible for repeatable server configuration',s:''},
+        {name:'Project: cloud app fully provisioned via IaC',s:''},
+      ]},
+      {num:'Phase 04',title:'Kubernetes, Monitoring & SRE',timeline:'Months 13–18',skills:[
+        {name:'K8s pods, deployments, services, ingress, Helm charts',s:''},
+        {name:'Prometheus, Grafana, ELK alerts and uptime checks',s:''},
+        {name:'Incident response, runbooks, and SLO/SLI metrics',s:''},
+        {name:'Apply for DevOps Engineer and SRE internships',s:''},
+      ]},
+    ],
+    tools:['Linux','Git','Docker','Kubernetes','Jenkins','GitHub Actions','Terraform','Ansible','AWS/GCP','Prometheus','Grafana','ELK'],
+    roles:['DevOps Engineer','Site Reliability Engineer','Cloud DevOps Engineer','Platform Engineer'],
+    projects:['Containerised app with working CI/CD','IaC-provisioned cloud stack','Kubernetes microservice with monitoring','Automated test-deploy pipeline'],
+    exams:[
+      {badge:'EXAM',name:'AWS Solutions Architect Associate',by:'Amazon Web Services',highlight:false,
+       details:'<strong>Cost:</strong> USD 150 (~₹12,500)<br><strong>Format:</strong> 65 MCQs, 130 min<br><strong>Focus:</strong> AWS infrastructure design'},
+      {badge:'EXAM',name:'CKA — Certified Kubernetes Admin',by:'Linux Foundation / CNCF',highlight:false,
+       details:'<strong>Cost:</strong> USD 395 (~₹33,000)<br><strong>Format:</strong> Performance-based, 2 hrs<br><strong>Focus:</strong> Kubernetes cluster management'},
+      {badge:'EXAM',name:'HashiCorp Terraform Associate',by:'HashiCorp',highlight:false,
+       details:'<strong>Cost:</strong> USD 70.50 (~₹5,900)<br><strong>Format:</strong> MCQ, 1 hr<br><strong>Focus:</strong> IaC with Terraform'},
+      {badge:'CERT',name:'GitHub Actions Certification',by:'GitHub',highlight:false,
+       details:'<strong>Cost:</strong> USD 99<br><strong>Focus:</strong> CI/CD pipelines, workflows, secrets, environments'},
+    ],
+    note:null,
+    resources:[
+      {label:'KodeKloud',url:'https://kodekloud.com'},
+      {label:'roadmap.sh/devops',url:'https://roadmap.sh/devops'},
+      {label:'Linux Foundation Training',url:'https://training.linuxfoundation.org'},
+      {label:'Terraform Registry',url:'https://registry.terraform.io'},
+    ]
+  },
+
+  cloud: {
+    icon:'☁️', name:'Cloud Engineer', tag:'12–18 months',
+    duration:'12–18 months', progress:8,
+    desc:'Design, deploy, and manage scalable cloud infrastructure on AWS, Azure, or GCP — the backbone of every modern application.',
+    milestones:[
+      {e:'🐧',label:'Linux & Networking',sub:'Month 3',state:'done'},
+      {e:'📜',label:'Cloud cert passed',sub:'Month 7',state:'active'},
+      {e:'🐳',label:'Containers & IaC',sub:'Month 12',state:''},
+      {e:'🔭',label:'Observability live',sub:'Month 16',state:''},
+      {e:'💼',label:'Cloud role ready',sub:'Month 18',state:''},
+    ],
+    phases:[
+      {num:'Phase 01',title:'Linux & Networking',timeline:'Months 1–3',skills:[
+        {name:'Linux CLI, permissions, cron, systemd, SSH',s:'done'},
+        {name:'Bash scripting — loops, functions, sed/awk',s:'active'},
+        {name:'TCP/IP, DNS, HTTP/S, firewall, VPN basics',s:''},
+        {name:'Virtualisation concepts and VM management',s:''},
+      ]},
+      {num:'Phase 02',title:'Cloud Platform Core',timeline:'Months 4–7',skills:[
+        {name:'AWS / Azure / GCP — compute, storage, networking, IAM',s:''},
+        {name:'VPC, subnets, security groups, and load balancers',s:''},
+        {name:'CLI tools, SDKs, and cloud billing basics',s:''},
+        {name:'Certification prep: AWS SAA or GCP ACE',s:''},
+      ]},
+      {num:'Phase 03',title:'Containers & IaC',timeline:'Months 8–12',skills:[
+        {name:'Docker — images, volumes, multi-stage builds',s:''},
+        {name:'Kubernetes — pods, services, deployments, Helm',s:''},
+        {name:'Terraform for infrastructure as code',s:''},
+        {name:'GitHub Actions or Jenkins CI/CD',s:''},
+      ]},
+      {num:'Phase 04',title:'Monitoring, Security & SRE',timeline:'Months 13–18',skills:[
+        {name:'Prometheus & Grafana dashboards and alerting',s:''},
+        {name:'ELK stack logging and observability',s:''},
+        {name:'Cloud security — IAM hardening, WAF, encryption',s:''},
+        {name:'Cost optimisation and FinOps basics',s:''},
+      ]},
+    ],
+    tools:['Linux','AWS/Azure/GCP','Terraform','Docker','Kubernetes','Ansible','GitHub Actions','Prometheus','Grafana','ELK','Vault'],
+    roles:['Cloud Engineer','Cloud Architect','DevOps/Cloud Engineer','Solutions Architect'],
+    projects:['Multi-tier cloud app on AWS','Kubernetes cluster with auto-scaling','Terraform-provisioned landing zone','Monitoring stack with alerting rules'],
+    exams:[
+      {badge:'EXAM',name:'AWS Solutions Architect Associate',by:'Amazon Web Services',highlight:false,
+       details:'<strong>Cost:</strong> USD 150<br><strong>Format:</strong> 65 MCQs, 130 min<br><strong>Recommended first cert for cloud</strong>'},
+      {badge:'EXAM',name:'GCP Associate Cloud Engineer',by:'Google Cloud',highlight:false,
+       details:'<strong>Cost:</strong> USD 200<br><strong>Format:</strong> 50 MCQs, 120 min<br><strong>Focus:</strong> GCP core services, deployment'},
+      {badge:'EXAM',name:'AZ-900 Azure Fundamentals',by:'Microsoft',highlight:false,
+       details:'<strong>Cost:</strong> USD 165<br><strong>Format:</strong> ~40–60 questions<br><strong>Good entry-point for Azure track</strong>'},
+      {badge:'EXAM',name:'CKA — Kubernetes Admin',by:'Linux Foundation / CNCF',highlight:false,
+       details:'<strong>Cost:</strong> USD 395<br><strong>Format:</strong> Performance-based, 2 hrs'},
+    ],
+    note:null,
+    resources:[
+      {label:'AWS Free Tier',url:'https://aws.amazon.com/free'},
+      {label:'GCP Free Tier',url:'https://cloud.google.com/free'},
+      {label:'KodeKloud',url:'https://kodekloud.com'},
+      {label:'CloudSkillsBoost (Google)',url:'https://cloudskillsboost.google'},
+    ]
+  },
+
+  cybersec: {
+    icon:'🔐', name:'Career in Cyber Security', tag:'14–20 months',
+    duration:'14–20 months', progress:8,
+    desc:'Protect systems and networks through networking mastery, Linux, cryptography, SOC analysis, detection engineering, and incident response.',
+    milestones:[
+      {e:'🌐',label:'Networking & OS',sub:'Month 3',state:'done'},
+      {e:'🏅',label:'Security+ cert',sub:'Month 8',state:'active'},
+      {e:'🎯',label:'First HTB machine',sub:'Month 12',state:''},
+      {e:'🔍',label:'SIEM lab ready',sub:'Month 16',state:''},
+      {e:'🛡️',label:'SOC internship',sub:'Month 20',state:''},
+    ],
+    phases:[
+      {num:'Phase 01',title:'Networking & Operating Systems',timeline:'Months 1–3',skills:[
+        {name:'OSI model, TCP/IP, DNS, HTTP/S, subnetting, firewalls',s:'done'},
+        {name:'Linux administration — users, permissions, services, logs',s:'done'},
+        {name:'Windows administration and hardening basics',s:'active'},
+        {name:'Wireshark packet analysis and short findings reports',s:''},
+      ]},
+      {num:'Phase 02',title:'Security Fundamentals',timeline:'Months 4–8',skills:[
+        {name:'CIA triad, OWASP Top 10, threat modelling, risk management',s:''},
+        {name:'Cryptography — symmetric, PKI, TLS, hashing',s:''},
+        {name:'Vulnerability lifecycle, scanning, and compliance basics',s:''},
+        {name:'CompTIA Security+ or equivalent cert prep',s:''},
+      ]},
+      {num:'Phase 03',title:'Tools & Detection',timeline:'Months 9–14',skills:[
+        {name:'Nmap, Wireshark, Burp Suite basics, Nessus scanning',s:''},
+        {name:'SIEM — Splunk or ELK, alert triage, log correlation',s:''},
+        {name:'Threat intelligence basics and IOC analysis',s:''},
+        {name:'Project: home SOC lab with logs and incident write-up',s:''},
+      ]},
+      {num:'Phase 04',title:'Incident Response & Career',timeline:'Months 15–20',skills:[
+        {name:'Incident lifecycle, forensics, malware indicators',s:''},
+        {name:'Containment, eradication, recovery, and retesting',s:''},
+        {name:'Portfolio: detection rules, case studies, security reports',s:''},
+        {name:'Apply for SOC Analyst, CSIRT, and Security Engineer roles',s:''},
+      ]},
+    ],
+    tools:['Linux','Windows Admin','Wireshark','Nmap','Burp Suite','Metasploit','Splunk','ELK','Nessus','Security+','CEH'],
+    roles:['Cybersecurity Analyst','SOC Analyst','Security Engineer','Incident Responder','CSIRT Analyst'],
+    projects:['Packet analysis report','Home SOC lab with Splunk','SIEM alert dashboard','Incident response case study','Vulnerability assessment report'],
+    exams:[
+      {badge:'EXAM',name:'CompTIA Security+',by:'CompTIA',highlight:false,
+       details:'<strong>Cost:</strong> USD 392 (~₹32,700)<br><strong>Format:</strong> 90 questions, 90 min<br><strong>Industry standard entry-level security cert</strong>'},
+      {badge:'EXAM',name:'CompTIA CySA+',by:'CompTIA',highlight:false,
+       details:'<strong>Cost:</strong> USD 392<br><strong>Format:</strong> 85 questions, 165 min<br><strong>Focus:</strong> SOC analyst / threat detection'},
+      {badge:'EXAM',name:'CEH — Certified Ethical Hacker',by:'EC-Council',highlight:false,
+       details:'<strong>Cost:</strong> ~₹30,000–40,000<br><strong>Format:</strong> 125 MCQs, 4 hrs<br><strong>Focus:</strong> Hacking techniques and countermeasures'},
+      {badge:'EXAM',name:'CISSP',by:'ISC²',highlight:false,
+       details:'<strong>Cost:</strong> USD 749 (~₹62,000)<br><strong>Format:</strong> CAT exam, 100–150 questions<br><strong>Senior-level — ideal after 3–5 years experience</strong>'},
+    ],
+    note:null,
+    resources:[
+      {label:'TryHackMe',url:'https://tryhackme.com'},
+      {label:'HackTheBox',url:'https://www.hackthebox.com'},
+      {label:'CyberDefenders',url:'https://cyberdefenders.org'},
+      {label:'OWASP',url:'https://owasp.org'},
+    ]
+  },
+
+  ethicalhacking: {
+    icon:'🛡️', name:'Career in Ethical Hacking', tag:'14–22 months',
+    duration:'14–22 months', progress:10,
+    desc:'A responsible offensive-security path for authorized labs, web security, vulnerability assessment, penetration testing, and red-team readiness.',
+    milestones:[
+      {e:'🧪',label:'Legal lab ready',sub:'Month 3',state:'done'},
+      {e:'🕸️',label:'OWASP labs done',sub:'Month 7',state:'active'},
+      {e:'📝',label:'First pentest report',sub:'Month 12',state:''},
+      {e:'🎯',label:'HTB Pro Hacker rank',sub:'Month 17',state:''},
+      {e:'💼',label:'Pentest job ready',sub:'Month 22',state:''},
+    ],
+    phases:[
+      {num:'Phase 01',title:'Core Foundations',timeline:'Months 1–3',skills:[
+        {name:'Networking, Linux, Windows, HTTP, DNS, and databases',s:'done'},
+        {name:'Python and Bash scripting for automation and utilities',s:'active'},
+        {name:'Legal local lab with intentionally vulnerable VMs',s:''},
+        {name:'Evidence capture, report templates, and note-taking',s:''},
+      ]},
+      {num:'Phase 02',title:'Web Application Security',timeline:'Months 4–7',skills:[
+        {name:'OWASP Top 10 — SQLi, XSS, CSRF, SSRF, auth flaws',s:''},
+        {name:'Burp Suite, browser dev tools, and request interception',s:''},
+        {name:'PortSwigger Web Security Academy labs',s:''},
+        {name:'Write clean vulnerability reports with CVSS and fixes',s:''},
+      ]},
+      {num:'Phase 03',title:'Vulnerability Assessment',timeline:'Months 8–12',skills:[
+        {name:'Nmap scanning, service enumeration, and CVE research',s:''},
+        {name:'Nessus / OpenVAS basics and risk scoring (CVSS)',s:''},
+        {name:'Metasploit in controlled lab environments only',s:''},
+        {name:'Project: full network assessment report for a lab',s:''},
+      ]},
+      {num:'Phase 04',title:'Penetration Testing Methodology',timeline:'Months 13–17',skills:[
+        {name:'Scope, ROE, methodology, evidence capture, retesting',s:''},
+        {name:'TryHackMe and Hack The Box labs with write-ups',s:''},
+        {name:'Privilege escalation, lateral movement basics',s:''},
+        {name:'Certification: eJPT, PNPT, CEH, or OSCP prep',s:''},
+      ]},
+      {num:'Phase 05',title:'Red Team Career',timeline:'Months 18–22',skills:[
+        {name:'Active Directory attacks and blue-team collaboration',s:''},
+        {name:'Portfolio of reports, scripts, and lab write-ups',s:''},
+        {name:'Responsible disclosure and client communication templates',s:''},
+        {name:'Apply for Ethical Hacker, Pen Tester, Red Team roles',s:''},
+      ]},
+    ],
+    tools:['Kali Linux','Nmap','Burp Suite','Metasploit','Wireshark','Nessus','Hack The Box','TryHackMe','PortSwigger Academy','Impacket','BloodHound'],
+    roles:['Ethical Hacker','Penetration Tester','Red Team Engineer','Security Consultant','Bug Bounty Hunter'],
+    projects:['Legal vulnerable lab setup','OWASP lab write-ups','Full network pentest report','Web application assessment report','Responsible disclosure template'],
+    exams:[
+      {badge:'EXAM',name:'eJPT — eLearnSecurity Junior PT',by:'INE / eLearnSecurity',highlight:false,
+       details:'<strong>Cost:</strong> USD 200 (~₹16,700)<br><strong>Format:</strong> 35 MCQs, 72 hrs lab<br><strong>Ideal first hands-on pentest certification</strong>'},
+      {badge:'EXAM',name:'CEH — Certified Ethical Hacker',by:'EC-Council',highlight:false,
+       details:'<strong>Cost:</strong> ~₹30,000–40,000<br><strong>Format:</strong> 125 MCQs, 4 hrs<br><strong>Widely recognised in India for corporate roles</strong>'},
+      {badge:'EXAM',name:'PNPT — Practical Network Pentest',by:'TCM Security',highlight:false,
+       details:'<strong>Cost:</strong> USD 399 (~₹33,000)<br><strong>Format:</strong> 5-day live pentest + report<br><strong>Highly respected practical certification</strong>'},
+      {badge:'EXAM',name:'OSCP — Offensive Security CTP',by:'OffSec',highlight:false,
+       details:'<strong>Cost:</strong> USD 1,499 (~₹1,25,000)<br><strong>Format:</strong> 24-hr lab exam + report<br><strong>Gold standard for pen testers</strong>'},
+    ],
+    note:'⚠️ Use this roadmap only for owned systems, authorized labs, or written-permission testing. All practice must be legal and ethical.',
+    resources:[
+      {label:'PortSwigger Academy',url:'https://portswigger.net/web-security'},
+      {label:'TryHackMe',url:'https://tryhackme.com'},
+      {label:'Hack The Box',url:'https://www.hackthebox.com'},
+      {label:'TCM Security',url:'https://tcm-sec.com'},
+    ]
+  },
+
+  dataeng: {
+    icon:'🏗️', name:'Data Engineer', tag:'14–20 months',
+    duration:'14–20 months', progress:12,
+    desc:'Build the data pipelines, warehouses, streaming systems, and cloud infrastructure that power analytics, BI, and AI at scale.',
+    milestones:[
+      {e:'🐍',label:'Python & SQL advanced',sub:'Month 3',state:'done'},
+      {e:'⚙️',label:'First ETL pipeline',sub:'Month 6',state:'active'},
+      {e:'🌊',label:'Kafka streaming live',sub:'Month 12',state:''},
+      {e:'🗄️',label:'Data warehouse built',sub:'Month 16',state:''},
+      {e:'💼',label:'Data Eng internship',sub:'Month 20',state:''},
+    ],
+    phases:[
+      {num:'Phase 01',title:'Programming & SQL Mastery',timeline:'Months 1–3',skills:[
+        {name:'Python — pandas, file I/O, APIs, task automation',s:'done'},
+        {name:'Advanced SQL — window functions, CTEs, query optimisation',s:'active'},
+        {name:'Linux CLI, Bash scripting, and cron jobs',s:''},
+        {name:'Git and collaborative data project workflows',s:''},
+      ]},
+      {num:'Phase 02',title:'Databases & Storage',timeline:'Months 4–8',skills:[
+        {name:'PostgreSQL, MySQL — relational design and indexing',s:''},
+        {name:'NoSQL — MongoDB, Redis, and Cassandra basics',s:''},
+        {name:'Cloud storage — S3, BigQuery, Snowflake, Redshift',s:''},
+        {name:'Data modelling — star / snowflake schemas, normalisation',s:''},
+      ]},
+      {num:'Phase 03',title:'Pipelines & Orchestration',timeline:'Months 9–14',skills:[
+        {name:'Apache Spark and PySpark for large-scale processing',s:''},
+        {name:'Apache Kafka streaming pipelines and consumers',s:''},
+        {name:'Apache Airflow DAG orchestration and scheduling',s:''},
+        {name:'dbt for SQL-first data transformation',s:''},
+      ]},
+      {num:'Phase 04',title:'DataOps & Career',timeline:'Months 15–20',skills:[
+        {name:'Data quality, lineage, governance, and cataloguing',s:''},
+        {name:'CI/CD pipelines for data projects',s:''},
+        {name:'AWS / GCP data services cert prep',s:''},
+        {name:'Capstone: end-to-end data platform from ingestion to BI',s:''},
+      ]},
+    ],
+    tools:['Python','SQL','PostgreSQL','MongoDB','Apache Spark','Apache Kafka','Airflow','dbt','Snowflake','BigQuery','AWS S3','Tableau'],
+    roles:['Data Engineer','Analytics Engineer','ETL Developer','Data Platform Engineer','DataOps Engineer'],
+    projects:['Batch ETL pipeline with Airflow','Real-time streaming dashboard with Kafka','dbt data transformation project','Cloud data warehouse build','End-to-end data platform'],
+    exams:[
+      {badge:'EXAM',name:'Google Professional Data Engineer',by:'Google Cloud',highlight:false,
+       details:'<strong>Cost:</strong> USD 200<br><strong>Format:</strong> 50–60 MCQs, 120 min<br><strong>Focus:</strong> GCP data services, Dataflow, BigQuery'},
+      {badge:'EXAM',name:'AWS Data Analytics Specialty',by:'Amazon Web Services',highlight:false,
+       details:'<strong>Cost:</strong> USD 300<br><strong>Format:</strong> 65 questions, 180 min<br><strong>Focus:</strong> Kinesis, Glue, Redshift, QuickSight'},
+      {badge:'CERT',name:'dbt Analytics Engineering Cert',by:'dbt Labs',highlight:false,
+       details:'<strong>Cost:</strong> USD 200<br><strong>Focus:</strong> SQL-first transformation, data modelling with dbt'},
+      {badge:'CERT',name:'Databricks Associate Developer',by:'Databricks',highlight:false,
+       details:'<strong>Cost:</strong> USD 200<br><strong>Focus:</strong> Apache Spark, Delta Lake, MLflow basics'},
+    ],
+    note:null,
+    resources:[
+      {label:'DataTalks.Club',url:'https://datatalks.club'},
+      {label:'dbt Learn',url:'https://courses.getdbt.com'},
+      {label:'roadmap.sh/data-engineer',url:'https://roadmap.sh/data-engineer'},
+      {label:'Mode SQL Tutorial',url:'https://mode.com/sql-tutorial'},
+    ]
+  },
+
+  mobile: {
+    icon:'📱', name:'Mobile App Developer', tag:'10–16 months',
+    duration:'10–16 months', progress:5,
+    desc:'Build cross-platform iOS and Android apps using Flutter (Dart) or React Native, from UI widgets to Firebase backend and Play Store publishing.',
+    milestones:[
+      {e:'🎯',label:'Dart & Flutter basics',sub:'Month 2',state:'done'},
+      {e:'📲',label:'First app on device',sub:'Month 5',state:'active'},
+      {e:'🔥',label:'Firebase integrated',sub:'Month 8',state:''},
+      {e:'📦',label:'Published on Play Store',sub:'Month 11',state:''},
+      {e:'💼',label:'Mobile dev internship',sub:'Month 15',state:''},
+    ],
+    phases:[
+      {num:'Phase 01',title:'Dart & Flutter Basics',timeline:'Months 1–3',skills:[
+        {name:'Dart language — types, async, streams, null safety',s:'done'},
+        {name:'Flutter SDK, widget tree, StatelessWidget, StatefulWidget',s:'active'},
+        {name:'Layouts — Column, Row, Stack, ListView, GridView',s:''},
+        {name:'Navigation, routing, and deep linking',s:''},
+      ]},
+      {num:'Phase 02',title:'State Management & Data',timeline:'Months 4–7',skills:[
+        {name:'State management — Provider, Riverpod, or Bloc',s:''},
+        {name:'REST API calls with http/dio and JSON parsing',s:''},
+        {name:'Firebase — Auth, Firestore, Cloud Storage, FCM',s:''},
+        {name:'Local storage — Hive, SQLite, and SharedPreferences',s:''},
+      ]},
+      {num:'Phase 03',title:'Native Features & Testing',timeline:'Months 8–11',skills:[
+        {name:'Camera, GPS, sensors, and platform channels',s:''},
+        {name:'Push notifications with Firebase Cloud Messaging',s:''},
+        {name:'Widget and integration testing with Flutter Test',s:''},
+        {name:'Publishing to Play Store and App Store',s:''},
+      ]},
+      {num:'Phase 04',title:'Portfolio & Launch',timeline:'Months 12–16',skills:[
+        {name:'3 published apps — different categories',s:''},
+        {name:'Performance profiling and memory optimisation',s:''},
+        {name:'Open-source Flutter contribution or package publish',s:''},
+        {name:'React Native basics for cross-skill versatility',s:''},
+      ]},
+    ],
+    tools:['Dart','Flutter','Firebase','Provider/Riverpod/Bloc','SQLite','Hive','FCM','Android Studio','Xcode','Play Console'],
+    roles:['Flutter Developer','Android Developer','Mobile App Developer','React Native Developer','Mobile UI Engineer'],
+    projects:['Todo app with Hive storage','Chat app with Firebase','News reader with REST API','E-commerce catalog app','Fitness tracker with charts'],
+    exams:[
+      {badge:'CERT',name:'Google Associate Android Developer',by:'Google',highlight:false,
+       details:'<strong>Cost:</strong> USD 149 (~₹12,400)<br><strong>Format:</strong> Hands-on coding project, 8 hrs<br><strong>Focus:</strong> Android fundamentals in Kotlin'},
+      {badge:'CERT',name:'Flutter Apprenticeship Certificate',by:'Kodeco (raywenderlich)',highlight:false,
+       details:'<strong>Cost:</strong> Subscription-based<br><strong>Focus:</strong> Flutter best practices and architecture'},
+      {badge:'CERT',name:'Meta React Native Specialization',by:'Meta / Coursera',highlight:false,
+       details:'<strong>Duration:</strong> ~5 months<br><strong>Covers:</strong> React Native, Redux, API integration'},
+      {badge:'CERT',name:'Firebase Essentials Certification',by:'Google / Firebase',highlight:false,
+       details:'<strong>Cost:</strong> Free study, paid badge<br><strong>Focus:</strong> Firestore, Auth, Hosting, Functions'},
+    ],
+    note:null,
+    resources:[
+      {label:'Flutter.dev',url:'https://flutter.dev/docs'},
+      {label:'Dart.dev',url:'https://dart.dev/guides'},
+      {label:'Firebase Docs',url:'https://firebase.google.com/docs'},
+      {label:'roadmap.sh/flutter',url:'https://roadmap.sh/flutter'},
+    ]
+  },
+
+  blockchain: {
+    icon:'⛓️', name:'Blockchain Developer', tag:'12–18 months',
+    duration:'12–18 months', progress:4,
+    desc:'Build decentralized applications (dApps), smart contracts in Solidity, and Web3 frontends on Ethereum and EVM-compatible chains.',
+    milestones:[
+      {e:'📗',label:'Blockchain fundamentals',sub:'Month 3',state:'done'},
+      {e:'🔐',label:'First Solidity contract',sub:'Month 6',state:'active'},
+      {e:'🌐',label:'dApp deployed on testnet',sub:'Month 10',state:''},
+      {e:'🛡️',label:'Contract security audit',sub:'Month 14',state:''},
+      {e:'💼',label:'Web3 role ready',sub:'Month 18',state:''},
+    ],
+    phases:[
+      {num:'Phase 01',title:'Blockchain Fundamentals',timeline:'Months 1–3',skills:[
+        {name:'Blockchain concepts — consensus, hashing, Merkle trees',s:'done'},
+        {name:'Cryptography basics — asymmetric keys, digital signatures',s:'active'},
+        {name:'Ethereum architecture, EVM, gas, and wallets',s:''},
+        {name:'JavaScript and Node.js for Web3 tooling',s:''},
+      ]},
+      {num:'Phase 02',title:'Smart Contract Development',timeline:'Months 4–7',skills:[
+        {name:'Solidity — types, mappings, structs, events, modifiers',s:''},
+        {name:'Hardhat or Foundry — compile, test, and deploy contracts',s:''},
+        {name:'OpenZeppelin contracts — ERC-20, ERC-721, access control',s:''},
+        {name:'Unit testing smart contracts with Mocha/Chai',s:''},
+      ]},
+      {num:'Phase 03',title:'dApp Frontend & Web3',timeline:'Months 8–12',skills:[
+        {name:'ethers.js or web3.js for contract interaction',s:''},
+        {name:'React frontend with MetaMask wallet connect',s:''},
+        {name:'IPFS for decentralised file storage',s:''},
+        {name:'Deploy dApp to IPFS, Fleek, or Vercel',s:''},
+      ]},
+      {num:'Phase 04',title:'Security & DeFi',timeline:'Months 13–18',skills:[
+        {name:'Smart contract security — reentrancy, overflow, access',s:''},
+        {name:'Slither and Mythril for contract auditing',s:''},
+        {name:'DeFi protocols — AMMs, lending, yield, oracles',s:''},
+        {name:'Layer 2 — Polygon, Arbitrum, Optimism basics',s:''},
+      ]},
+    ],
+    tools:['Solidity','Hardhat','Foundry','ethers.js','web3.js','OpenZeppelin','MetaMask','IPFS','Truffle','Ganache','Slither','Alchemy'],
+    roles:['Blockchain Developer','Smart Contract Developer','Web3 Frontend Developer','DeFi Engineer','Contract Auditor'],
+    projects:['ERC-20 token deploy','NFT minting dApp','Decentralised voting contract','Multi-sig wallet','DeFi lending protocol prototype'],
+    exams:[
+      {badge:'CERT',name:'Blockchain Council Developer',by:'Blockchain Council',highlight:false,
+       details:'<strong>Cost:</strong> ~₹12,000–15,000<br><strong>Format:</strong> Online MCQ + practical<br><strong>Focus:</strong> Blockchain principles, Solidity, dApps'},
+      {badge:'CERT',name:'Ethereum Developer Bootcamp',by:'Alchemy University',highlight:false,
+       details:'<strong>Cost:</strong> Free<br><strong>Duration:</strong> ~7 weeks<br><strong>Covers:</strong> Solidity, Hardhat, ethers.js, dApps'},
+      {badge:'CERT',name:'LearnWeb3 Developer DAO',by:'LearnWeb3',highlight:false,
+       details:'<strong>Cost:</strong> Free<br><strong>Tracks:</strong> Freshman → Sophomore → Junior → Senior<br><strong>Covers:</strong> Full Web3 stack'},
+      {badge:'CERT',name:'Consensys Developer Program',by:'Consensys Academy',highlight:false,
+       details:'<strong>Cost:</strong> Free (bootcamp-style)<br><strong>Focus:</strong> Ethereum, Solidity, Truffle, MetaMask'},
+    ],
+    note:null,
+    resources:[
+      {label:'Alchemy University',url:'https://university.alchemy.com'},
+      {label:'Solidity Docs',url:'https://docs.soliditylang.org'},
+      {label:'LearnWeb3',url:'https://learnweb3.io'},
+      {label:'CryptoZombies',url:'https://cryptozombies.io'},
+    ]
+  },
+
+  uiux: {
+    icon:'🎨', name:'UI/UX Designer', tag:'10–14 months',
+    duration:'10–14 months', progress:6,
+    desc:'Design intuitive, beautiful digital products using research, wireframing, prototyping, Figma, and a portfolio that gets you hired.',
+    milestones:[
+      {e:'🎨',label:'Design principles',sub:'Month 2',state:'done'},
+      {e:'🖼️',label:'First Figma prototype',sub:'Month 5',state:'active'},
+      {e:'🔬',label:'User research done',sub:'Month 8',state:''},
+      {e:'📁',label:'Portfolio with 3 case studies',sub:'Month 11',state:''},
+      {e:'💼',label:'UX internship',sub:'Month 14',state:''},
+    ],
+    phases:[
+      {num:'Phase 01',title:'Design Foundations',timeline:'Months 1–3',skills:[
+        {name:'Design principles — hierarchy, spacing, contrast, alignment',s:'done'},
+        {name:'Typography, colour theory, and grid systems',s:'active'},
+        {name:'Figma — auto layout, components, variables, prototyping',s:''},
+        {name:'Accessibility (WCAG) and inclusive design basics',s:''},
+      ]},
+      {num:'Phase 02',title:'User Research & UX',timeline:'Months 4–7',skills:[
+        {name:'User research methods — interviews, surveys, contextual inquiry',s:''},
+        {name:'Personas, journey maps, and task analysis',s:''},
+        {name:'Information architecture, card sorting, sitemaps',s:''},
+        {name:'Wireframing and low-fidelity concept testing',s:''},
+      ]},
+      {num:'Phase 03',title:'High-Fidelity & Interaction',timeline:'Months 8–11',skills:[
+        {name:'Design systems — tokens, component libraries, Figma docs',s:''},
+        {name:'Micro-interactions, transitions, and animation with Figma',s:''},
+        {name:'Usability testing, heuristic evaluation, A/B test basics',s:''},
+        {name:'Handoff to developers — dev mode, redlines, and specs',s:''},
+      ]},
+      {num:'Phase 04',title:'Portfolio & Job Prep',timeline:'Months 12–14',skills:[
+        {name:'3+ case studies with problem → process → outcome format',s:''},
+        {name:'Portfolio website using Framer or Webflow',s:''},
+        {name:'Behavioural and design critique interview prep',s:''},
+        {name:'Apply for UI/UX Designer, Product Designer roles',s:''},
+      ]},
+    ],
+    tools:['Figma','Adobe XD','FigJam','Webflow','Framer','Maze','Hotjar','Miro','Principle','Lottie'],
+    roles:['UI Designer','UX Designer','Product Designer','UX Researcher','Interaction Designer'],
+    projects:['Mobile banking app redesign','E-commerce UX audit + redesign','SaaS onboarding flow','Design system for a startup','Accessibility review case study'],
+    exams:[
+      {badge:'CERT',name:'Google UX Design Certificate',by:'Google / Coursera',highlight:false,
+       details:'<strong>Duration:</strong> ~7 months, ~10 hrs/week<br><strong>Cost:</strong> ~₹3,000/month<br><strong>Highly respected entry-level UX credential</strong>'},
+      {badge:'CERT',name:'Interaction Design Foundation',by:'IDF',highlight:false,
+       details:'<strong>Cost:</strong> ~₹6,500/year<br><strong>Courses:</strong> 30+ UX courses<br><strong>Globally recognised UX learning platform'},
+      {badge:'CERT',name:'Nielsen Norman Group UX Certificate',by:'NN/g',highlight:false,
+       details:'<strong>Cost:</strong> USD 4,000+ for full certification<br><strong>Format:</strong> Multiple courses + credential<br><strong>Gold standard for UX professionals</strong>'},
+      {badge:'CERT',name:'Meta Product Design Certificate',by:'Meta / Coursera',highlight:false,
+       details:'<strong>Duration:</strong> ~5 months<br><strong>Covers:</strong> UI design, Figma, UX research, prototyping'},
+    ],
+    note:null,
+    resources:[
+      {label:'Figma Community',url:'https://www.figma.com/community'},
+      {label:'NN/g UX Articles',url:'https://www.nngroup.com/articles'},
+      {label:'Refactoring UI',url:'https://www.refactoringui.com'},
+      {label:'Laws of UX',url:'https://lawsofux.com'},
+    ]
+  },
+
+  academic: {
+    icon:'🎓', name:'Lecturer / Academic in CS', tag:'3–6 years',
+    duration:'3–6 years', progress:5,
+    desc:'A structured path from MCA/MSc to Assistant Professor via UGC NET, CSIR NET, SET/KSET, PhD in Computer Science, and teaching readiness.',
+    milestones:[
+      {e:'🎓',label:'MCA / MSc CS complete',sub:'Year 1',state:'done'},
+      {e:'📋',label:'UGC NET / SET cleared',sub:'Year 1–2',state:'active'},
+      {e:'🔬',label:'PhD enrolled & ongoing',sub:'Year 2–5',state:''},
+      {e:'📚',label:'Research papers published',sub:'Year 3–5',state:''},
+      {e:'🏫',label:'Assistant Professor post',sub:'Year 4–6',state:''},
+    ],
+    phases:[
+      {num:'Stage 01',title:'Academic Foundation',timeline:'Year 1 (Ongoing MCA/MSc)',skills:[
+        {name:'Maintain 60%+ aggregate — minimum eligibility for NET/SET',s:'done'},
+        {name:'Strong conceptual depth in CS core subjects',s:'active'},
+        {name:'Technical writing — reports, paper formatting, LaTeX basics',s:''},
+        {name:'Start reading IEEE/ACM papers in your interest area',s:''},
+      ]},
+      {num:'Stage 02',title:'NET / SET Examination Prep',timeline:'6–12 months',skills:[
+        {name:'UGC NET Paper 1 — Teaching aptitude, reasoning, ICT, research',s:''},
+        {name:'UGC NET Paper 2 CS syllabus — all 10 units of CS/IT',s:''},
+        {name:'KSET / SLET Karnataka — state-level eligibility if preferred',s:''},
+        {name:'Mock tests, PYQs (10 years), and time management',s:''},
+      ]},
+      {num:'Stage 03',title:'PhD Enrollment & Research',timeline:'Year 2–5',skills:[
+        {name:'Identify a PhD guide and research area (AI, Cyber, Networks…)',s:''},
+        {name:'Clear CSIR NET or UGC JRF for fellowship funding',s:''},
+        {name:'KCET / university entrance exam for PhD admission',s:''},
+        {name:'Literature review, research proposal, and thesis writing',s:''},
+      ]},
+      {num:'Stage 04',title:'Research & Publications',timeline:'Year 2–5',skills:[
+        {name:'Publish in Scopus / Web of Science indexed journals',s:''},
+        {name:'Present at IEEE, ACM, or Springer conferences',s:''},
+        {name:'Write and defend your research thesis',s:''},
+        {name:'Apply for GATE CS for PSU and IIT research scholarships',s:''},
+      ]},
+      {num:'Stage 05',title:'Teaching Career Launch',timeline:'Year 4–6',skills:[
+        {name:'Prepare teaching demos and subject expertise for interviews',s:''},
+        {name:'Apply to private engineering / arts & science colleges',s:''},
+        {name:'Target government colleges — requires NET + PhD',s:''},
+        {name:'Build academic portfolio: courses taught, publications, talks',s:''},
+      ]},
+    ],
+    tools:['LaTeX','Mendeley / Zotero','Overleaf','Python (research)','MATLAB (research)','SPSS / R','Google Scholar','IEEE Xplore','ACM DL'],
+    roles:['Assistant Professor (CS/IT)','Lecturer in BCA/MCA colleges','Research Scholar / JRF','Academic Researcher','Visiting Faculty'],
+    projects:['UGC NET qualified (target)','1–2 journal papers published','Conference presentation','Teaching demo video','Research proposal document'],
+    exams:[
+      {badge:'EXAM',name:'UGC NET — CS & IT (Paper 1 + 2)',by:'NTA / University Grants Commission',highlight:true,
+       details:'<strong>Frequency:</strong> Twice yearly (June & December)<br><strong>Eligibility:</strong> 55% in PG (MCA/MSc CS) — 50% for SC/ST<br><strong>Paper 1:</strong> Teaching aptitude, logical reasoning, ICT, research methods (50 Qs)<br><strong>Paper 2:</strong> CS/IT — Data Structures, OS, DBMS, Networks, TOC, Algorithms, AI/ML, Software Engineering (100 Qs)<br><strong>Qualifying:</strong> No negative marking; minimum 40–45% cutoff per paper<br><strong>Use:</strong> Eligibility for Assistant Professor + JRF for research fellowship'},
+      {badge:'EXAM',name:'CSIR NET — Computer Science',by:'CSIR / NTA',highlight:true,
+       details:'<strong>Frequency:</strong> Twice yearly<br><strong>Eligibility:</strong> MSc CS or equivalent with 55%<br><strong>Focus:</strong> Mathematical foundations, CS theory, systems, programming, AI<br><strong>Note:</strong> More theoretical/research-oriented than UGC NET<br><strong>JRF:</strong> Monthly fellowship ~₹37,000 for first 2 years, ₹42,000 thereafter<br><strong>Best for:</strong> Students targeting IIT/NIT research programmes'},
+      {badge:'EXAM',name:'KSET — Karnataka State Eligibility Test',by:'Bangalore University / KPSC',highlight:true,
+       details:'<strong>Frequency:</strong> Once yearly<br><strong>Eligibility:</strong> 55% PG in relevant subject (50% SC/ST)<br><strong>Structure:</strong> Paper 1 (General + Teaching) + Paper 2 (CS/IT subject)<br><strong>Use:</strong> Eligibility for Lecturer posts in Karnataka state colleges<br><strong>Benefit:</strong> Easier to qualify than UGC NET; sufficient for many private colleges in Karnataka'},
+      {badge:'EXAM',name:'GATE CS — Graduate Aptitude Test Engineering',by:'IITs / IISc',highlight:false,
+       details:'<strong>Frequency:</strong> Once yearly (February)<br><strong>Eligibility:</strong> BE/BTech/MCA/MSc CS final year or completed<br><strong>Format:</strong> 65 questions (MCQ + NAT), 3 hrs<br><strong>Score use:</strong> M.Tech admission at IITs/NITs, PSU jobs, PhD fellowship at IISc, stipend-based research<br><strong>Key syllabus:</strong> DSA, OS, DBMS, CN, TOC, Algorithms, Compilers, Discrete Maths'},
+      {badge:'EXAM',name:'PhD Entrance — University Specific',by:'Various Universities (Jain, VTU, BU…)',highlight:false,
+       details:'<strong>Eligibility:</strong> 55% in PG degree (MCA / MSc CS)<br><strong>Process:</strong> Written test + Research proposal + Interview<br><strong>At Jain DU:</strong> Apply through Jain PhD portal; entrance + guide availability<br><strong>VTU PhD:</strong> PGCET-PhD or direct if UGC NET/JRF qualified<br><strong>Duration:</strong> Minimum 3 years (full-time), 5 years (part-time)'},
+      {badge:'EXAM',name:'SET / SLET — State Level Eligibility',by:'Various State Bodies',highlight:false,
+       details:'<strong>Other states:</strong> AP SET, TS SET, MH SET, etc.<br><strong>Structure:</strong> Similar to KSET — Paper 1 + Paper 2<br><strong>Use:</strong> State-specific college lecturer eligibility<br><strong>Tip:</strong> UGC NET qualification is valid across all states for central/private colleges'},
+    ],
+    note:'🎓 For government college positions, both UGC NET qualification AND a PhD are typically required. Private colleges often hire with NET alone. Starting salary for Assistant Professor in Karnataka private colleges: ₹35,000–₹60,000/month. Government colleges (7th Pay Commission): ₹57,700–₹1,82,400 (Level 10).',
+    resources:[
+      {label:'NTA UGC NET',url:'https://ugcnet.nta.ac.in'},
+      {label:'CSIR NET Portal',url:'https://csirnet.nta.ac.in'},
+      {label:'GATE 2026 — IIT Kanpur',url:'https://gate2025.iitkgp.ac.in'},
+      {label:'Jain University PhD Admissions',url:'https://www.jainuniversity.ac.in'},
+      {label:'UGC NET CS Syllabus',url:'https://ugcnet.nta.ac.in/'},
+      {label:'Knowledge Gate (NET prep)',url:'https://www.youtube.com/@KnowledgeGATEbySwatiMam'},
+    ]
+  }
+};
+
+/* ══════════════════════════════════════════
+   RENDERER
+══════════════════════════════════════════ */
+let current = 'datascience';
+
+function selectStream(key, btn) {
+  current = key;
+  document.querySelectorAll('.stream-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderPanel(key);
+  document.getElementById('rdm-panel').scrollIntoView({behavior:'smooth',block:'start'});
+}
+
+function renderPanel(key) {
+  const r = STREAMS[key];
+  const el = document.getElementById('rdm-panel');
+  el.innerHTML = buildPanel(r);
+}
+
+function buildPanel(r) {
+  return `
+    ${buildHeader(r)}
+    ${buildProgress(r)}
+    ${buildMilestones(r)}
+    ${buildPhases(r)}
+    ${buildBottom(r)}
+    ${r.note ? `<div class="note-card">${r.note}</div>` : ''}
+    ${buildExams(r)}
+    ${buildResources(r)}
+  `;
+}
+
+function buildHeader(r) {
+  return `
+  <div class="rdm-header">
+    <div>
+      <div class="rdm-tag">📍 ${r.tag}</div>
+      <div class="rdm-title">${r.name}</div>
+      <div class="rdm-desc">${r.desc}</div>
+    </div>
+    <div class="rdm-meta">
+      <span class="rdm-icon">${r.icon}</span>
+      <div class="rdm-duration">${r.duration}</div>
+    </div>
+  </div>`;
+}
+
+function buildProgress(r) {
+  return `
+  <div class="rdm-progress">
+    <span class="progress-label">Foundation Progress</span>
+    <div class="progress-track"><div class="progress-fill" style="width:${r.progress}%"></div></div>
+    <span class="progress-pct">${r.progress}%</span>
+  </div>`;
+}
+
+function buildMilestones(r) {
+  const nodes = r.milestones.map(m => `
+    <div class="ms-node ${m.state}">
+      <div class="ms-circle">${m.e}</div>
+      <div class="ms-label">${m.label}</div>
+      <div class="ms-sub">${m.sub}</div>
+    </div>
+  `).join('');
+  return `
+  <div class="milestone-section">
+    <div class="section-heading">Career Milestones</div>
+    <div class="milestone-track">${nodes}</div>
+  </div>`;
+}
+
+function buildPhases(r) {
+  const cards = r.phases.map(p => {
+    const skills = p.skills.map(s => `
+      <li class="skill-item ${s.s}">
+        <span class="skill-dot"></span>
+        <span class="skill-text">${s.name}</span>
+      </li>`).join('');
+    return `
+    <div class="phase-card">
+      <div class="phase-num">${p.num}</div>
+      <div class="phase-title">${p.title}</div>
+      <div class="phase-timeline">${p.timeline}</div>
+      <ul class="skill-list">${skills}</ul>
+    </div>`;
+  }).join('');
+  return `
+  <div class="phases-section">
+    <div class="section-heading">Learning Phases</div>
+    <div class="phases-grid">${cards}</div>
+  </div>`;
+}
+
+function buildBottom(r) {
+  const chips = r.tools.map(t => `<span class="chip">${t}</span>`).join('');
+  const roles = r.roles.map(role => `
+    <li class="role-item">
+      <span class="role-arrow">▸</span>${role}
+    </li>`).join('');
+  const projs = r.projects.map(p => `
+    <li class="role-item">
+      <span class="role-arrow">◆</span>${p}
+    </li>`).join('');
+  return `
+  <div class="bottom-grid">
+    <div>
+      <div class="info-panel" style="margin-bottom:14px">
+        <div class="info-title">Tools & Technologies</div>
+        <div class="chips">${chips}</div>
+      </div>
+      <div class="info-panel">
+        <div class="info-title">Capstone Project Ideas</div>
+        <ul class="role-list">${projs}</ul>
+      </div>
+    </div>
+    <div class="info-panel">
+      <div class="info-title">Target Job Roles</div>
+      <ul class="role-list">${roles}</ul>
+    </div>
+  </div>`;
+}
+
+function buildExams(r) {
+  if (!r.exams || r.exams.length === 0) return '';
+  const cards = r.exams.map(e => `
+    <div class="exam-card ${e.highlight ? 'exam-highlight' : ''}">
+      <span class="exam-badge">${e.badge}</span>
+      <div class="exam-name">${e.name}</div>
+      <div class="exam-by">${e.by}</div>
+      <div class="exam-details">${e.details}</div>
+    </div>`).join('');
+  return `
+  <div class="exams-section">
+    <div class="section-heading">Certifications &amp; Examinations</div>
+    <div class="exam-grid">${cards}</div>
+  </div>`;
+}
+
+function buildResources(r) {
+  if (!r.resources || r.resources.length === 0) return '';
+  const links = r.resources.map(res => `
+    <a class="res-link" href="${res.url}" target="_blank" rel="noopener">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
+      ${res.label}
+    </a>`).join('');
+  return `
+  <div class="resources-row">
+    ${links}
+  </div>`;
+}
+
+// Init
+renderPanel('datascience');
+
+/* ══════════════════════════════════════════
+   SPLIT DROPDOWN — career specialization
+══════════════════════════════════════════ */
+const STREAM_META = {
+  datascience:    {icon:'📊', name:'Data Science'},
+  aiml:           {icon:'🤖', name:'AI / ML'},
+  webdev:         {icon:'🌐', name:'Full Stack Web'},
+  devops:         {icon:'⚙️', name:'DevOps'},
+  cloud:          {icon:'☁️', name:'Cloud Engineering'},
+  cybersec:       {icon:'🔐', name:'Cyber Security'},
+  ethicalhacking: {icon:'🛡️', name:'Ethical Hacking'},
+  dataeng:        {icon:'🏗️', name:'Data Engineering'},
+  mobile:         {icon:'📱', name:'Mobile Dev'},
+  blockchain:     {icon:'⛓️', name:'Blockchain'},
+  uiux:           {icon:'🎨', name:'UI/UX Design'},
+  academic:       {icon:'🎓', name:'Lecturer / Academic'},
+};
+
+function toggleDropdown(e) {
+  e.stopPropagation();
+  const wrap = document.getElementById('split-btn-wrap');
+  wrap.classList.toggle('open');
+}
+
+function closeDropdown() {
+  document.getElementById('split-btn-wrap').classList.remove('open');
+}
+
+// Close when clicking outside
+document.addEventListener('click', function(e) {
+  const wrap = document.getElementById('split-btn-wrap');
+  if (wrap && !wrap.contains(e.target)) closeDropdown();
+});
+
+function selectFromDropdown(key) {
+  const meta = STREAM_META[key] || {icon:'📌', name:key};
+
+  // Update split button label
+  document.getElementById('split-icon').textContent = meta.icon;
+  document.getElementById('split-label').textContent = meta.name;
+
+  // Update active state in dropdown
+  document.querySelectorAll('.dd-item').forEach(b => b.classList.remove('active'));
+  const activeItem = document.querySelector('.dd-item[data-key="' + key + '"]');
+  if (activeItem) activeItem.classList.add('active');
+
+  // Sync career-nav tabs
+  document.querySelectorAll('.cnav-tab').forEach(b => b.classList.remove('active'));
+  const navBtn = document.querySelector('.cnav-tab[data-stream="' + key + '"]');
+  if (navBtn) {
+    navBtn.classList.add('active');
+    navBtn.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  }
+
+  closeDropdown();
+
+  // Render roadmap
+  current = key;
+  renderPanel(key);
+  document.getElementById('rdm-panel').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+function splitMainClick() {
+  // Clicking the main label re-renders the current stream and scrolls to it
+  document.getElementById('rdm-panel').scrollIntoView({behavior:'smooth', block:'start'});
+}
+
+// Stubs so nothing breaks if old references remain
+function focusStream(key, btn) { selectFromDropdown(key); }
+function showAllStreams() { toggleDropdown({stopPropagation:()=>{}}); }
+
+/* ══════════════════════════════════════════
+   CAREER NAV BAR — sync with stream grid
+══════════════════════════════════════════ */
+function navSelect(key, btn) {
+  document.querySelectorAll('.cnav-tab').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  btn.scrollIntoView({behavior:'smooth', block:'nearest', inline:'center'});
+  selectFromDropdown(key);
+}
+
+
+
+/* ══════════════════════════════════════════
+   THEME — detect from dashboard / localStorage / OS
+══════════════════════════════════════════ */
+function applyTheme(isDark) {
+  const html = document.documentElement;
+  if (isDark) {
+    html.removeAttribute('data-theme');
+    document.getElementById('theme-icon').textContent = '☀️';
+    document.getElementById('theme-label').textContent = 'Light';
+  } else {
+    html.setAttribute('data-theme', 'light');
+    document.getElementById('theme-icon').textContent = '🌙';
+    document.getElementById('theme-label').textContent = 'Dark';
+  }
+  localStorage.setItem('bcu_theme', isDark ? 'dark' : 'light');
+}
+
+function toggleTheme() {
+  const isDark = !document.documentElement.hasAttribute('data-theme');
+  applyTheme(!isDark);
+}
+
+function initTheme() {
+  // 1. URL param ?theme=light|dark  (passed from Dashboard)
+  const urlParams = new URLSearchParams(window.location.search);
+  const urlTheme = urlParams.get('theme');
+  if (urlTheme) { applyTheme(urlTheme !== 'light'); return; }
+
+  // 2. localStorage key shared with BCU Dashboard
+  const saved = localStorage.getItem('bcu_theme');
+  if (saved) { applyTheme(saved !== 'light'); return; }
+
+  // 3. OS colour-scheme preference
+  const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+  applyTheme(prefersDark);
+}
+
+initTheme();
+
+// Receive theme change from parent Dashboard
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'bcu-theme') {
+    applyTheme(e.data.theme !== 'light');
+  }
+});
+
+// Receive theme from parent Dashboard
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'bcu-theme') {
+    applyTheme(e.data.theme !== 'light');
+  }
+});
+
+// Listen for theme sync from parent Dashboard
+window.addEventListener('message', function(e) {
+  if (e.data && e.data.type === 'bcu-theme') {
+    applyTheme(e.data.theme !== 'light');
+  }
+});
+</script>
+</body>
+</html>

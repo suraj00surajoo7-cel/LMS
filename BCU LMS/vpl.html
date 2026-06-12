@@ -1,0 +1,2676 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VPL — Virtual Programming Lab · BCU</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:opsz,wght@9..40,300;9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════
+   LIGHT THEME (default)
+═══════════════════════════════════════════════ */
+:root{
+  --bg:#f4f4f4; --card:#ffffff; --accent:#1a1a1a;
+  --text:#111111; --muted:#888888; --border:#e0e0e0;
+  --radius:16px; --radius-sm:10px;
+  --shadow:0 8px 40px rgba(0,0,0,0.09);
+  --shadow-hover:0 16px 48px rgba(0,0,0,0.14);
+  --mono:'JetBrains Mono','Fira Code',Consolas,'Courier New',monospace;
+  --sans:'DM Sans',system-ui,sans-serif;
+  --topbar-h:64px;
+  --desc-w:264px;
+  --pass:#16a34a; --pass-bg:#f0fdf4; --pass-border:#bbf7d0;
+  --fail:#dc2626; --fail-bg:#fef2f2; --fail-border:#fecaca;
+  --run-bg:#eff6ff; --run:#2563eb;
+  --dbg:#7c3aed;
+  --editor-bg:#ffffff; --editor-text:#1e293b;
+  --gutter-bg:#fafafa; --topbar-bg:rgba(255,255,255,0.97);
+  --grid-line:rgba(0,0,0,0.04);
+  --code-sel:rgba(99,102,241,0.15);
+}
+
+/* ═══════════════════════════════════════════════
+   DARK THEME
+═══════════════════════════════════════════════ */
+[data-theme="dark"]{
+  --bg:#0f172a; --card:#1e293b; --accent:#e2e8f0;
+  --text:#f1f5f9; --muted:#94a3b8; --border:#334155;
+  --shadow:0 8px 40px rgba(0,0,0,0.5);
+  --shadow-hover:0 16px 48px rgba(0,0,0,0.6);
+  --pass:#22c55e; --pass-bg:#052e16; --pass-border:#166534;
+  --fail:#ef4444; --fail-bg:#2a0a0a; --fail-border:#7f1d1d;
+  --run-bg:#0c1a3d; --run:#60a5fa;
+  --dbg:#a78bfa;
+  --editor-bg:#1e293b; --editor-text:#e2e8f0;
+  --gutter-bg:#162032; --topbar-bg:rgba(15,23,42,0.97);
+  --grid-line:rgba(255,255,255,0.025);
+  --code-sel:rgba(99,102,241,0.25);
+}
+
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+html{scroll-behavior:smooth;}
+html,body{height:100%;font-family:var(--sans);background:var(--bg);color:var(--text);overflow:hidden;transition:background .25s,color .25s;}
+
+/* grid watermark */
+body::before{
+  content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background-image:linear-gradient(var(--grid-line) 1px,transparent 1px),
+                   linear-gradient(90deg,var(--grid-line) 1px,transparent 1px);
+  background-size:40px 40px;
+  transition:background-image .25s;
+}
+
+/* ─── TOPBAR ─── */
+.topbar{
+  position:fixed;top:0;left:0;right:0;height:var(--topbar-h);
+  display:flex;align-items:center;gap:6px;padding:0 1.2rem;
+  background:var(--topbar-bg);backdrop-filter:blur(14px);
+  border-bottom:1px solid var(--border);z-index:200;flex-shrink:0;
+  transition:background .25s, border-color .25s;
+}
+.brand{display:flex;align-items:center;gap:10px;text-decoration:none;padding-right:14px;border-right:1px solid var(--border);margin-right:6px;flex-shrink:0;}
+.brand-logo{
+  height:34px;padding:0 10px;background:var(--accent);border-radius:8px;
+  display:grid;place-items:center;font-size:13px;font-weight:800;
+  color:var(--bg);letter-spacing:1.5px;flex-shrink:0;font-family:var(--sans);
+}
+.brand-name{font-size:14px;font-weight:700;color:var(--text);font-family:var(--sans);}
+.brand-sub{font-size:11px;color:var(--muted);font-weight:500;}
+
+/* toolbar buttons */
+.tb-new{
+  width:36px;height:36px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--accent);font-size:20px;font-weight:300;cursor:pointer;
+  display:grid;place-items:center;transition:all .18s;flex-shrink:0;font-family:var(--sans);
+}
+.tb-new:hover{background:var(--accent);color:var(--bg);border-color:var(--accent);transform:rotate(90deg);}
+
+.tb-run{
+  height:36px;padding:0 16px;border:none;border-radius:8px;
+  background:var(--accent);color:var(--bg);font-size:13px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;transition:all .18s;flex-shrink:0;
+  font-family:var(--sans);box-shadow:0 4px 14px rgba(0,0,0,0.18);
+}
+.tb-run:hover{opacity:.85;transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,0.22);}
+.tb-run:disabled{background:#999;cursor:wait;transform:none;box-shadow:none;}
+
+.tb-debug{
+  height:36px;padding:0 14px;border:1px solid #d8b4fe;border-radius:8px;
+  background:var(--bg);color:var(--dbg);font-size:13px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;transition:all .18s;flex-shrink:0;
+  font-family:var(--sans);
+}
+.tb-debug:hover{background:var(--dbg);color:#fff;border-color:var(--dbg);}
+.tb-debug:disabled{opacity:.5;cursor:wait;}
+
+.tb-btn{
+  height:34px;border:1px solid var(--border);border-radius:7px;background:var(--bg);
+  color:var(--text);cursor:pointer;padding:0 11px;font-size:12px;font-weight:600;
+  display:inline-flex;align-items:center;gap:5px;transition:all .15s;white-space:nowrap;
+  font-family:var(--sans);
+}
+.tb-btn:hover{border-color:var(--muted);background:var(--card);box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.tb-btn.danger:hover{background:var(--fail-bg);border-color:var(--fail-border);color:var(--fail);}
+.tb-sep{width:1px;height:24px;background:var(--border);margin:0 4px;flex-shrink:0;}
+.tb-spacer{flex:1;}
+
+/* lang select */
+.lang-select{
+  height:34px;border:1px solid var(--border);border-radius:7px;
+  background:var(--card);color:var(--text);padding:0 10px;font-size:12px;font-weight:600;
+  font-family:var(--mono);cursor:pointer;outline:none;transition:border-color .15s;
+}
+.lang-select:hover,.lang-select:focus{border-color:var(--muted);}
+
+/* save dot */
+.save-dot{width:6px;height:6px;border-radius:50%;background:#f59e0b;display:none;margin-left:2px;}
+.save-dot.dirty{display:inline-block;}
+
+/* profile */
+.profile-area{
+  display:flex;align-items:center;gap:9px;padding:5px 10px;
+  border:1px solid var(--border);border-radius:10px;cursor:pointer;
+  transition:all .15s;position:relative;flex-shrink:0;background:var(--card);
+}
+.profile-area:hover{box-shadow:var(--shadow);border-color:var(--muted);}
+.avatar{
+  width:30px;height:30px;border-radius:50%;background:var(--accent);
+  display:grid;place-items:center;font-size:11px;font-weight:800;color:var(--bg);flex-shrink:0;
+}
+.profile-name{font-size:12px;font-weight:700;color:var(--text);line-height:1.1;}
+.profile-role{font-size:10px;color:var(--muted);}
+.online-dot{width:7px;height:7px;border-radius:50%;background:#22c55e;flex-shrink:0;animation:pulse-dot 2s infinite;}
+
+@keyframes pulse-dot{
+  0%,100%{box-shadow:0 0 0 0 rgba(34,197,94,0.4);}
+  50%{box-shadow:0 0 0 4px rgba(34,197,94,0);}
+}
+
+/* profile dropdown */
+.profile-dropdown{
+  display:none;position:absolute;top:calc(100% + 8px);right:0;
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius-sm);
+  width:220px;z-index:300;box-shadow:var(--shadow-hover);overflow:hidden;
+}
+.profile-area.open .profile-dropdown{display:block;animation:fadeUp .2s ease both;}
+.pd-header{padding:12px 14px;border-bottom:1px solid var(--border);background:var(--bg);}
+.pd-name{font-size:13px;font-weight:700;color:var(--text);}
+.pd-email{font-size:11px;color:var(--muted);margin-top:2px;}
+/* login source badge */
+.pd-source{
+  font-size:10px;font-weight:700;color:var(--run);background:var(--run-bg);
+  border:1px solid rgba(37,99,235,0.2);border-radius:4px;padding:1px 6px;margin-top:4px;display:inline-block;
+}
+.pd-item{
+  display:flex;align-items:center;gap:9px;padding:9px 14px;
+  font-size:12px;font-weight:600;color:var(--text);cursor:pointer;transition:background .12s;
+}
+.pd-item:hover{background:var(--bg);}
+.pd-item.red:hover{background:var(--fail-bg);color:var(--fail);}
+.pd-divider{height:1px;background:var(--border);}
+
+/* ─── SHELL ─── */
+.shell{
+  position:relative;z-index:1;
+  display:flex;height:calc(100vh - var(--topbar-h));
+  margin-top:var(--topbar-h);overflow:hidden;
+}
+
+/* ─── DESC PANEL ─── */
+.desc-panel{
+  width:var(--desc-w);flex-shrink:0;display:flex;flex-direction:column;
+  background:var(--card);border-right:none;overflow:hidden;
+  transition:width .15s,background .25s;min-width:140px;max-width:420px;
+}
+.desc-header{
+  padding:12px 14px 10px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;background:var(--bg);flex-shrink:0;
+}
+.desc-header-title{font-size:12px;font-weight:800;color:var(--text);letter-spacing:.3px;}
+.desc-body{flex:1;overflow-y:auto;padding:14px;}
+.desc-task{
+  font-size:12.5px;color:var(--text);line-height:1.6;margin-bottom:14px;
+  padding:10px 12px;background:var(--bg);border:1px solid var(--border);
+  border-radius:var(--radius-sm);
+}
+.desc-task strong{font-weight:700;display:block;margin-bottom:4px;color:var(--accent);}
+.tc-row{
+  background:var(--card);border:1px solid var(--border);border-radius:8px;
+  padding:9px 11px;margin-bottom:8px;font-size:11.5px;color:var(--text);
+}
+.tc-row-label{font-weight:800;font-size:11px;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.5px;display:block;margin-bottom:4px;}
+.tc-row code{font-family:var(--mono);font-size:11px;color:var(--accent);background:var(--bg);
+  padding:1px 5px;border-radius:4px;}
+.custom-stdin label{font-size:11px;font-weight:700;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.5px;display:block;margin-bottom:6px;}
+.custom-stdin textarea{
+  width:100%;height:90px;border:1px solid var(--border);border-radius:8px;
+  background:var(--card);color:var(--text);font-family:var(--mono);font-size:11.5px;
+  padding:7px;resize:vertical;outline:none;
+}
+.custom-stdin textarea:focus{border-color:var(--muted);}
+
+/* ─── HORIZONTAL RESIZE HANDLE ─── */
+.h-resize-bar{
+  width:8px;flex-shrink:0;background:var(--border);cursor:col-resize;
+  display:flex;align-items:center;justify-content:center;
+  position:relative;z-index:10;transition:background .15s;
+  border-left:1px solid var(--border);border-right:1px solid var(--border);
+}
+.h-resize-bar:hover,.h-resize-bar.dragging{background:var(--dbg);width:8px;}
+.h-resize-handle{
+  display:flex;flex-direction:column;gap:3px;align-items:center;
+  padding:8px 2px;border-radius:4px;transition:all .15s;pointer-events:none;
+}
+.h-resize-dot{width:3px;height:3px;border-radius:50%;background:var(--muted);}
+.h-resize-bar:hover .h-resize-dot,.h-resize-bar.dragging .h-resize-dot{background:#fff;}
+
+/* ─── EDITOR AREA ─── */
+.editor-area{flex:1;display:flex;flex-direction:column;min-width:200px;overflow:hidden;background:var(--card);transition:background .25s;}
+
+/* file tabs */
+.file-tab-bar{
+  height:40px;background:var(--bg);border-bottom:1px solid var(--border);
+  display:flex;align-items:flex-end;overflow-x:auto;overflow-y:hidden;flex-shrink:0;
+}
+.file-tab-bar::-webkit-scrollbar{height:3px;}
+.file-tab-bar::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px;}
+.file-tab{
+  height:36px;padding:0 14px;display:inline-flex;align-items:center;gap:8px;
+  font-family:var(--mono);font-size:12px;color:var(--muted);font-weight:600;
+  background:transparent;border-right:1px solid var(--border);cursor:pointer;
+  white-space:nowrap;flex-shrink:0;user-select:none;border-top:2px solid transparent;
+  transition:all .15s;
+}
+.file-tab:hover{color:var(--text);background:rgba(128,128,128,0.05);}
+.file-tab.active{background:var(--card);color:var(--text);border-top-color:var(--accent);}
+.tab-x{font-size:11px;color:var(--border);padding:1px 3px;border-radius:3px;cursor:pointer;line-height:1;}
+.tab-x:hover{background:var(--border);color:var(--text);}
+
+/* code editor */
+.code-wrap{flex:1;display:flex;overflow:hidden;position:relative;}
+.editor-inner{display:flex;width:100%;height:100%;overflow:auto;font-family:var(--mono);}
+.gutter{
+  padding:14px 10px 14px 12px;color:var(--muted);text-align:right;user-select:none;
+  background:var(--gutter-bg);border-right:1px solid var(--border);
+  font-size:13px;line-height:1.7;font-family:var(--mono);min-width:44px;
+  flex-shrink:0;white-space:pre;position:relative;transition:background .25s;
+}
+.gutter-line{
+  display:block;line-height:1.7;cursor:pointer;padding-right:2px;
+  transition:color .12s;border-radius:3px 0 0 3px;
+}
+.gutter-line:hover{color:var(--accent);background:rgba(128,128,128,0.1);}
+.gutter-line.bp{color:#fff;background:var(--fail);font-weight:700;}
+.code-ta{
+  flex:1;border:none;outline:none;background:var(--editor-bg);color:var(--editor-text);
+  font-family:var(--mono);font-size:13px;line-height:1.7;
+  padding:14px 16px 14px 14px;resize:none;tab-size:4;
+  white-space:pre;overflow-wrap:normal;transition:background .25s,color .25s;
+  caret-color:var(--accent);
+}
+.code-ta::selection{background:var(--code-sel);}
+.preview-frame{flex:1;border:none;background:#fff;}
+
+/* status bar */
+.status-bar{
+  height:24px;background:var(--accent);display:flex;align-items:center;
+  padding:0 14px;font-size:11px;color:var(--bg);gap:14px;flex-shrink:0;
+  transition:background .25s,color .25s;
+}
+.status-bar .sb-r{margin-left:auto;display:flex;gap:14px;}
+
+/* ─── BOTTOM PANELS ─── */
+.bottom-wrap{flex-shrink:0;background:var(--card);border-top:1px solid var(--border);display:flex;flex-direction:column;max-height:42vh;transition:background .25s;}
+
+/* ─── VERTICAL RESIZE BAR (enhanced) ─── */
+.resize-bar{
+  height:14px;background:var(--bg);cursor:ns-resize;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  border-top:1px solid var(--border);border-bottom:1px solid var(--border);
+  transition:background .15s;
+  position:relative;
+  user-select:none;
+}
+.resize-bar:hover,.resize-bar.dragging{background:var(--dbg);}
+.resize-bar-handle{
+  display:flex;flex-direction:row;gap:3px;pointer-events:none;
+}
+.resize-bar-dot{width:14px;height:2px;border-radius:1px;background:var(--muted);}
+.resize-bar:hover .resize-bar-dot,.resize-bar.dragging .resize-bar-dot{background:#fff;}
+.resize-bar-label{
+  position:absolute;left:16px;font-size:10px;font-weight:700;color:var(--muted);
+  font-family:var(--sans);letter-spacing:.5px;text-transform:uppercase;pointer-events:none;
+}
+.resize-bar:hover .resize-bar-label,.resize-bar.dragging .resize-bar-label{color:#fff;}
+
+/* panel tabs */
+.panel-tabs{
+  height:38px;background:var(--bg);border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:2px;padding:0 10px;flex-shrink:0;
+}
+.panel-tab{
+  height:28px;padding:0 14px;border:1px solid transparent;border-radius:6px;
+  font-size:12px;font-weight:700;color:var(--muted);cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:all .15s;font-family:var(--sans);
+  background:transparent;
+}
+.panel-tab:hover{color:var(--text);background:var(--card);border-color:var(--border);}
+.panel-tab.active{background:var(--card);color:var(--text);border-color:var(--border);box-shadow:0 1px 4px rgba(0,0,0,0.07);}
+.panel-tab.dbg-tab.active{color:var(--dbg);border-color:#d8b4fe;}
+.panel-body{flex:1;overflow:hidden;display:flex;}
+.panel-pane{display:none;flex:1;overflow-y:auto;padding:12px 16px 16px;}
+.panel-pane.active{display:flex;flex-direction:column;gap:10px;}
+
+/* compile table */
+.compile-file{font-family:var(--mono);font-size:11.5px;color:var(--muted);margin-bottom:8px;}
+.rtable{width:100%;border-collapse:collapse;font-size:12px;}
+.rtable th{
+  text-align:left;font-size:10.5px;font-weight:800;color:var(--muted);
+  text-transform:uppercase;letter-spacing:.7px;padding:6px 10px;
+  border-bottom:1px solid var(--border);background:var(--bg);
+}
+.rtable td{padding:8px 10px;border-bottom:1px solid var(--border);font-family:var(--mono);vertical-align:middle;color:var(--text);}
+.rtable tr:last-child td{border-bottom:none;}
+.rtable tr:hover td{background:var(--bg);}
+.pill{display:inline-flex;align-items:center;gap:4px;padding:3px 9px;border-radius:999px;
+  font-family:var(--sans);font-size:10.5px;font-weight:800;letter-spacing:.3px;}
+.pill-pass{background:var(--pass-bg);color:var(--pass);border:1px solid var(--pass-border);}
+.pill-fail{background:var(--fail-bg);color:var(--fail);border:1px solid var(--fail-border);}
+.pill-run{background:var(--run-bg);color:var(--run);border:1px solid rgba(37,99,235,0.3);}
+.pill-ready{background:var(--bg);color:var(--muted);border:1px solid var(--border);}
+.terminal-out{
+  font-family:var(--mono);font-size:12px;color:var(--editor-text);line-height:1.65;
+  background:var(--bg);border:1px solid var(--border);border-radius:8px;
+  padding:10px 12px;white-space:pre-wrap;min-height:60px;
+}
+
+/* live indicator in terminal */
+.live-pulse{display:inline-flex;align-items:center;gap:6px;font-size:11px;color:var(--run);font-weight:700;}
+.live-pulse-dot{width:6px;height:6px;border-radius:50%;background:var(--run);animation:blink 1s infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:0;}}
+
+/* ─── DEBUGGER ─── */
+.dbg-layout{display:flex;gap:12px;flex:1;min-height:0;overflow:hidden;}
+.dbg-col-left{flex:1;display:flex;flex-direction:column;gap:10px;min-width:0;overflow-y:auto;}
+.dbg-col-right{width:220px;flex-shrink:0;display:flex;flex-direction:column;gap:8px;overflow-y:auto;}
+
+/* horizontal drag between dbg columns */
+.dbg-h-resize{
+  width:6px;cursor:col-resize;background:var(--border);flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;transition:background .15s;border-radius:3px;
+}
+.dbg-h-resize:hover{background:var(--dbg);}
+
+.dbg-section{border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;}
+.dbg-section-hdr{
+  padding:7px 12px;background:var(--bg);border-bottom:1px solid var(--border);
+  font-size:11px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.6px;
+  display:flex;align-items:center;justify-content:space-between;
+}
+.dbg-section-body{padding:10px 12px;font-size:12px;background:var(--card);}
+
+/* debugger controls */
+.dbg-controls{display:flex;gap:6px;align-items:center;padding:8px 12px;
+  background:var(--bg);border-bottom:1px solid var(--border);}
+.dbg-ctrl-btn{
+  height:28px;padding:0 10px;border:1px solid var(--border);border-radius:6px;
+  background:var(--card);color:var(--text);font-size:11.5px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:5px;transition:all .15s;font-family:var(--sans);
+}
+.dbg-ctrl-btn:hover{border-color:var(--muted);background:var(--bg);}
+.dbg-ctrl-btn:disabled{opacity:.4;cursor:not-allowed;}
+.dbg-ctrl-btn.step{color:var(--dbg);border-color:#d8b4fe;background:var(--bg);}
+.dbg-ctrl-btn.step:hover{background:var(--dbg);color:#fff;border-color:var(--dbg);}
+.dbg-status{margin-left:auto;font-size:11px;font-weight:700;color:var(--muted);}
+.dbg-status.running{color:var(--run);}
+.dbg-status.paused{color:var(--dbg);}
+.dbg-status.done{color:var(--pass);}
+.dbg-status.error{color:var(--fail);}
+
+/* call stack */
+.stack-frame{
+  display:flex;align-items:center;gap:8px;padding:5px 8px;border-radius:6px;
+  font-size:11.5px;cursor:pointer;transition:background .12s;
+}
+.stack-frame:hover{background:var(--bg);}
+.stack-frame.active-frame{background:var(--run-bg);color:var(--run);}
+.frame-arrow{font-size:10px;color:var(--muted);}
+.frame-name{font-family:var(--mono);font-weight:700;flex:1;}
+.frame-line{font-size:11px;color:var(--muted);}
+
+/* variables */
+.var-row{
+  display:flex;align-items:baseline;gap:6px;padding:4px 0;
+  border-bottom:1px solid var(--border);font-size:12px;
+}
+.var-row:last-child{border-bottom:none;}
+.var-name{font-family:var(--mono);font-weight:700;color:var(--dbg);min-width:80px;}
+.var-type{font-size:10px;color:var(--muted);font-family:var(--mono);min-width:40px;}
+.var-val{font-family:var(--mono);color:var(--text);flex:1;word-break:break-all;}
+.var-changed{color:#d97706;font-weight:700;}
+
+/* breakpoints list */
+.bp-item{
+  display:flex;align-items:center;gap:8px;padding:4px 6px;border-radius:5px;
+  font-size:11.5px;cursor:pointer;transition:background .12s;
+}
+.bp-item:hover{background:var(--bg);}
+.bp-dot{width:9px;height:9px;border-radius:50%;background:var(--fail);flex-shrink:0;}
+.bp-loc{font-family:var(--mono);flex:1;color:var(--text);}
+.bp-del{color:var(--muted);font-size:13px;padding:0 3px;cursor:pointer;}
+.bp-del:hover{color:var(--fail);}
+.bp-empty{font-size:11.5px;color:var(--muted);padding:4px 2px;}
+
+/* debug console */
+.dbg-console{
+  font-family:var(--mono);font-size:12px;color:var(--editor-text);line-height:1.65;
+  background:var(--bg);border-radius:6px;padding:8px;min-height:50px;
+  white-space:pre-wrap;max-height:100px;overflow-y:auto;
+}
+.dbg-console .dbg-info{color:var(--run);}
+.dbg-console .dbg-warn{color:#d97706;}
+.dbg-console .dbg-err{color:var(--fail);}
+.dbg-console .dbg-ok{color:var(--pass);}
+.dbg-console .dbg-bp{color:var(--dbg);}
+
+/* watch expr */
+.watch-input-row{display:flex;gap:6px;margin-bottom:6px;}
+.watch-input{
+  flex:1;height:28px;border:1px solid var(--border);border-radius:6px;
+  padding:0 8px;font-family:var(--mono);font-size:11.5px;outline:none;background:var(--card);color:var(--text);
+}
+.watch-input:focus{border-color:var(--muted);}
+.watch-add-btn{
+  height:28px;padding:0 10px;border:1px solid var(--border);border-radius:6px;
+  background:var(--card);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;
+  font-family:var(--sans);transition:all .15s;
+}
+.watch-add-btn:hover{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+.watch-row{
+  display:flex;align-items:center;gap:6px;padding:4px 0;
+  border-bottom:1px solid var(--border);font-size:11.5px;
+}
+.watch-row:last-child{border-bottom:none;}
+.watch-expr{font-family:var(--mono);font-weight:700;color:var(--dbg);flex:1;}
+.watch-val{font-family:var(--mono);color:var(--text);}
+.watch-del{color:var(--muted);cursor:pointer;font-size:14px;}
+.watch-del:hover{color:var(--fail);}
+
+/* ─── MODALS ─── */
+.modal-overlay{
+  display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(4px);z-index:400;align-items:center;justify-content:center;
+}
+.modal-overlay.open{display:flex;animation:fadeIn .2s ease both;}
+.modal{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:28px;width:400px;
+  box-shadow:0 32px 80px rgba(0,0,0,0.2);display:flex;flex-direction:column;gap:16px;
+}
+.modal h3{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);display:flex;align-items:center;gap:10px;}
+.modal label{font-size:12px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:6px;}
+.modal input,.modal select{
+  width:100%;height:38px;border:1px solid var(--border);border-radius:8px;
+  color:var(--text);background:var(--bg);padding:0 12px;font-size:13px;font-family:var(--sans);outline:none;
+}
+.modal input:focus,.modal select:focus{border-color:var(--muted);}
+.modal-btns{display:flex;gap:8px;justify-content:flex-end;margin-top:4px;}
+.btn-cancel{height:36px;padding:0 16px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--text);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);}
+.btn-cancel:hover{background:var(--border);}
+.btn-primary{height:36px;padding:0 18px;border:none;border-radius:8px;
+  background:var(--accent);color:var(--bg);font-size:13px;font-weight:700;cursor:pointer;font-family:var(--sans);}
+.btn-primary:hover{opacity:.85;}
+
+/* ─── TOAST ─── */
+.toast{
+  position:fixed;bottom:24px;right:24px;background:var(--card);
+  border:1px solid var(--border);border-radius:10px;padding:11px 16px;
+  font-size:12.5px;font-weight:600;color:var(--text);
+  display:flex;align-items:center;gap:9px;z-index:500;
+  transform:translateY(60px);opacity:0;transition:all .3s ease;
+  pointer-events:none;box-shadow:var(--shadow);
+}
+.toast.show{transform:translateY(0);opacity:1;}
+
+/* ─── SETTINGS ─── */
+.settings-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.45);
+  backdrop-filter:blur(4px);z-index:400;align-items:center;justify-content:center;}
+.settings-overlay.open{display:flex;}
+.settings-box{
+  background:var(--card);border:1px solid var(--border);border-radius:var(--radius);width:440px;max-height:85vh;
+  overflow-y:auto;box-shadow:0 32px 80px rgba(0,0,0,0.2);
+}
+.settings-hdr{
+  padding:20px 24px 16px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);
+}
+.settings-hdr h2{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text);}
+.settings-close{border:none;background:none;font-size:18px;cursor:pointer;color:var(--muted);padding:4px;}
+.settings-close:hover{color:var(--text);}
+.settings-section{padding:16px 24px;}
+.settings-section h4{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;
+  letter-spacing:.7px;margin-bottom:12px;}
+.settings-row{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid var(--border);
+}
+.settings-row:last-child{border-bottom:none;}
+.settings-label{font-size:13px;font-weight:600;color:var(--text);}
+.settings-sub{font-size:11px;color:var(--muted);margin-top:2px;}
+.toggle{position:relative;width:38px;height:20px;cursor:pointer;flex-shrink:0;}
+.toggle input{opacity:0;width:0;height:0;}
+.toggle-track{position:absolute;inset:0;background:var(--border);border-radius:10px;transition:.2s;}
+.toggle input:checked+.toggle-track{background:var(--accent);}
+.toggle-track::before{
+  content:'';position:absolute;left:3px;top:3px;width:14px;height:14px;
+  background:var(--card);border-radius:50%;transition:.2s;
+}
+.toggle input:checked+.toggle-track::before{transform:translateX(18px);}
+
+/* theme selector pills */
+.theme-pills{display:flex;gap:8px;}
+.theme-pill{
+  height:32px;padding:0 14px;border:1.5px solid var(--border);border-radius:8px;
+  font-size:12px;font-weight:700;cursor:pointer;font-family:var(--sans);
+  display:inline-flex;align-items:center;gap:6px;transition:all .15s;
+  background:var(--bg);color:var(--muted);
+}
+.theme-pill.active{border-color:var(--accent);color:var(--text);background:var(--card);box-shadow:0 2px 8px rgba(0,0,0,0.1);}
+.theme-pill:hover{border-color:var(--muted);color:var(--text);}
+
+/* ─── KEYBOARD SHORTCUTS ─── */
+.kbd{display:inline-block;padding:2px 6px;border:1px solid var(--border);border-radius:5px;
+  font-size:11px;font-family:var(--mono);background:var(--bg);color:var(--text);}
+
+/* ─── SCROLLBARS ─── */
+::-webkit-scrollbar{width:5px;height:5px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px;}
+::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+
+/* ─── REAL-TIME INDICATOR ─── */
+.rt-badge{
+  display:inline-flex;align-items:center;gap:5px;padding:3px 9px;
+  background:var(--pass-bg);color:var(--pass);border:1px solid var(--pass-border);
+  border-radius:99px;font-size:10px;font-weight:800;letter-spacing:.3px;
+  font-family:var(--sans);
+}
+.rt-badge-dot{width:5px;height:5px;border-radius:50%;background:var(--pass);animation:blink 1.5s infinite;}
+
+/* tools toggle button */
+.tb-tools-toggle{
+  height:36px;padding:0 12px;border:1px solid var(--border);border-radius:8px;
+  background:var(--bg);color:var(--text);font-size:12px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:6px;transition:all .18s;flex-shrink:0;
+  font-family:var(--sans);
+}
+.tb-tools-toggle:hover{border-color:var(--muted);background:var(--card);box-shadow:0 2px 8px rgba(0,0,0,0.08);}
+.tb-tools-toggle.open{background:var(--accent);color:var(--bg);border-color:var(--accent);}
+.tb-tools-toggle.open #toolsChevron{transform:rotate(180deg);}
+
+/* collapsible tools group */
+.tools-group{
+  display:none;align-items:center;gap:6px;
+}
+.tools-group.open{
+  display:flex;
+  animation:toolsSlide .2s ease both;
+}
+@keyframes toolsSlide{
+  from{opacity:0;transform:translateX(-8px);}
+  to{opacity:1;transform:translateX(0);}
+}
+
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes slideIn{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+
+/* ─── EVALUATE BUTTON ─── */
+.tb-eval{
+  height:36px;padding:0 16px;border:none;border-radius:8px;
+  background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;font-size:13px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:7px;transition:all .18s;flex-shrink:0;
+  font-family:var(--sans);box-shadow:0 4px 14px rgba(22,163,74,0.3);
+}
+.tb-eval:hover{opacity:.88;transform:translateY(-1px);box-shadow:0 6px 20px rgba(22,163,74,0.38);}
+.tb-eval:disabled{background:#999;cursor:wait;transform:none;box-shadow:none;}
+
+/* ─── TERMINAL PANE ─── */
+.terminal-wrap{
+  display:flex;flex-direction:column;height:100%;background:#0d1117;border-radius:0;overflow:hidden;
+}
+.terminal-toolbar{
+  display:flex;align-items:center;gap:8px;padding:6px 12px;
+  background:#161b22;border-bottom:1px solid #30363d;flex-shrink:0;
+}
+.terminal-title{font-size:11px;font-weight:700;color:#8b949e;font-family:var(--sans);letter-spacing:.3px;flex:1;}
+.terminal-btn{
+  height:24px;padding:0 10px;border:1px solid #30363d;border-radius:5px;
+  background:#21262d;color:#8b949e;font-size:10.5px;font-weight:700;cursor:pointer;
+  display:inline-flex;align-items:center;gap:4px;transition:all .15s;font-family:var(--sans);
+}
+.terminal-btn:hover{background:#30363d;color:#e6edf3;border-color:#484f58;}
+.terminal-output{
+  flex:1;overflow-y:auto;padding:12px 14px;font-family:var(--mono);font-size:12.5px;
+  color:#e6edf3;line-height:1.7;white-space:pre-wrap;word-break:break-all;background:#0d1117;
+}
+.terminal-output::-webkit-scrollbar{width:5px;}
+.terminal-output::-webkit-scrollbar-thumb{background:#30363d;border-radius:3px;}
+.term-line{display:block;padding:0;}
+.term-line.stdout{color:#e6edf3;}
+.term-line.stderr{color:#ff7b72;}
+.term-line.info{color:#79c0ff;font-style:italic;}
+.term-line.success{color:#56d364;}
+.term-line.divider{color:#484f58;user-select:none;}
+.term-line.timing{color:#8b949e;font-size:11px;}
+.terminal-stdin-row{
+  display:flex;align-items:center;gap:0;border-top:1px solid #30363d;background:#161b22;flex-shrink:0;
+}
+.terminal-prompt{
+  padding:0 10px;font-family:var(--mono);font-size:12.5px;color:#56d364;flex-shrink:0;
+  display:flex;align-items:center;height:36px;font-weight:700;
+}
+.terminal-stdin{
+  flex:1;height:36px;background:transparent;border:none;outline:none;
+  font-family:var(--mono);font-size:12.5px;color:#e6edf3;padding:0 6px;
+}
+.terminal-stdin::placeholder{color:#484f58;}
+.terminal-send{
+  height:36px;padding:0 14px;background:transparent;border:none;border-left:1px solid #30363d;
+  color:#56d364;font-size:11.5px;font-weight:700;cursor:pointer;font-family:var(--sans);
+  transition:background .15s;
+}
+.terminal-send:hover{background:#21262d;}
+
+/* ─── EVALUATE PANE ─── */
+.eval-wrap{display:flex;flex-direction:column;height:100%;overflow:hidden;}
+.eval-header{
+  display:flex;align-items:center;gap:10px;padding:8px 14px;
+  background:var(--bg);border-bottom:1px solid var(--border);flex-shrink:0;flex-wrap:wrap;
+}
+.eval-title{font-size:12px;font-weight:800;color:var(--text);flex:1;font-family:var(--sans);}
+.eval-score{
+  font-size:12px;font-weight:800;font-family:var(--mono);
+  padding:3px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--muted);
+}
+.eval-btn{
+  height:28px;padding:0 12px;border-radius:6px;border:none;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:var(--sans);transition:all .15s;display:inline-flex;align-items:center;gap:5px;
+}
+.eval-btn.run-all{background:linear-gradient(135deg,#16a34a,#15803d);color:#fff;box-shadow:0 2px 8px rgba(22,163,74,0.25);}
+.eval-btn.run-all:hover{opacity:.87;transform:translateY(-1px);}
+.eval-btn.run-all:disabled{background:#999;transform:none;box-shadow:none;cursor:wait;}
+.eval-btn.add-tc{background:var(--card);color:var(--text);border:1px solid var(--border);}
+.eval-btn.add-tc:hover{border-color:var(--muted);background:var(--bg);}
+.eval-body{flex:1;overflow-y:auto;padding:10px 14px;display:flex;flex-direction:column;gap:8px;}
+.tc-editor{
+  border:1px solid var(--border);border-radius:var(--radius-sm);overflow:hidden;background:var(--card);
+}
+.tc-editor-head{
+  display:flex;align-items:center;gap:8px;padding:6px 12px;
+  background:var(--bg);border-bottom:1px solid var(--border);
+}
+.tc-name-input{
+  flex:1;background:transparent;border:none;outline:none;font-size:12px;font-weight:700;
+  color:var(--text);font-family:var(--sans);
+}
+.tc-status-pill{margin-left:auto;flex-shrink:0;}
+.tc-del-btn{
+  width:22px;height:22px;border:1px solid var(--border);border-radius:5px;background:var(--card);
+  color:var(--muted);font-size:13px;cursor:pointer;display:grid;place-items:center;transition:all .15s;
+  font-family:var(--sans);line-height:1;flex-shrink:0;
+}
+.tc-del-btn:hover{background:var(--fail-bg);border-color:var(--fail-border);color:var(--fail);}
+.tc-fields{display:grid;grid-template-columns:1fr 1fr;gap:0;}
+.tc-field{padding:8px 12px;border-right:1px solid var(--border);}
+.tc-field:last-child{border-right:none;}
+.tc-field label{font-size:10px;font-weight:800;color:var(--muted);text-transform:uppercase;letter-spacing:.5px;display:block;margin-bottom:5px;}
+.tc-field textarea{
+  width:100%;min-height:42px;max-height:120px;background:var(--bg);border:1px solid var(--border);
+  border-radius:6px;padding:5px 8px;font-family:var(--mono);font-size:11.5px;color:var(--text);
+  resize:vertical;outline:none;transition:border-color .15s;
+}
+.tc-field textarea:focus{border-color:var(--muted);}
+.tc-output-actual{
+  padding:6px 12px 8px;border-top:1px solid var(--border);font-family:var(--mono);font-size:11.5px;
+  color:var(--muted);background:var(--card);
+}
+.tc-output-actual .tc-out-label{font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.5px;margin-bottom:3px;display:block;}
+.tc-out-val{font-size:12px;font-family:var(--mono);color:var(--text);word-break:break-all;}
+.tc-out-pass{color:var(--pass);}
+.tc-out-fail{color:var(--fail);}
+.tc-out-pending{color:var(--muted);}
+.eval-summary{
+  padding:10px 14px;border-top:1px solid var(--border);background:var(--bg);
+  display:flex;align-items:center;gap:12px;flex-shrink:0;font-size:12px;font-weight:700;
+}
+.eval-progress{flex:1;height:6px;background:var(--border);border-radius:3px;overflow:hidden;}
+.eval-progress-bar{height:100%;background:var(--pass);border-radius:3px;transition:width .4s ease;}
+</style>
+</head>
+<body>
+
+<!-- ══ TOPBAR ═════════════════════════════════════════════ -->
+<div class="topbar">
+  <!-- BCU Brand -->
+  <a class="brand" href="Dashboard.html">
+    <div class="brand-logo">BCU</div>
+    <div>
+      <div class="brand-name">Virtual Programming Lab</div>
+      <div class="brand-sub">BCU — Department of CS</div>
+    </div>
+  </a>
+
+  <!-- Back to Dashboard -->
+  <a href="Dashboard.html" class="tb-btn" style="text-decoration:none;margin-right:4px;" title="Back to Dashboard">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/></svg>
+    Dashboard
+  </a>
+  <button class="tb-new" id="newFileBtn" title="New File (Ctrl+N)">+</button>
+
+  <div class="tb-sep"></div>
+
+  <!-- Run & Debug -->
+  <button class="tb-run" id="runBtn">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
+    Run
+  </button>
+  <button class="tb-debug" id="debugBtn">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 .278a.77.77 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/></svg>
+    Debug
+  </button>
+  <button class="tb-eval" id="evalBtn" title="Evaluate all test cases (Ctrl+E)">
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647.708.708-7 7a.5.5 0 0 1-.708 0z"/></svg>
+    Evaluate
+  </button>
+
+  <div class="tb-sep"></div>
+
+  <!-- Tools toggle button -->
+  <button class="tb-tools-toggle" id="toolsToggleBtn" title="Toggle toolbar">
+    <svg width="14" height="14" viewBox="0 0 16 16" fill="currentColor"><circle cx="2" cy="8" r="1.5"/><circle cx="8" cy="8" r="1.5"/><circle cx="14" cy="8" r="1.5"/></svg>
+    Tools
+    <svg id="toolsChevron" width="10" height="10" viewBox="0 0 16 16" fill="currentColor" style="transition:transform .25s;"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>
+  </button>
+
+  <!-- Collapsible utilities group -->
+  <div class="tools-group" id="toolsGroup">
+    <div class="tb-sep"></div>
+    <button class="tb-btn" id="saveBtn" title="Save (Ctrl+S)">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M2 1a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1V2a1 1 0 0 0-1-1H9.5a1 1 0 0 0-1 1v7.293l2.646-2.647a.5.5 0 0 1 .708.708l-3.5 3.5a.5.5 0 0 1-.708 0l-3.5-3.5a.5.5 1 1 1 .708-.708L7.5 9.293V2a2 2 0 0 1 2-2H14a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h2.5a.5.5 0 0 1 0 1z"/></svg>
+      Save <span class="save-dot" id="saveDot"></span>
+    </button>
+    <button class="tb-btn danger" id="resetBtn" title="Reset code">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3a5 5 0 1 0 4.546 2.914.5.5 0 0 1 .908-.417A6 6 0 1 1 8 2v1z"/><path d="M8 4.466V.534a.25.25 0 0 1 .41-.192l2.36 1.966c.12.1.12.284 0 .384L8.41 4.658A.25.25 0 0 1 8 4.466z"/></svg>
+      Reset
+    </button>
+    <button class="tb-btn" id="copyBtn" title="Copy code">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5zm-3-1A1.5 1.5 0 0 0 5 1.5v1A1.5 1.5 0 0 0 6.5 4h3A1.5 1.5 0 0 0 11 2.5v-1A1.5 1.5 0 0 0 9.5 0z"/></svg>
+      Copy
+    </button>
+    <button class="tb-btn" id="fmtBtn" title="Format code">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M1 2.5A1.5 1.5 0 0 1 2.5 1h3A1.5 1.5 0 0 1 7 2.5v3A1.5 1.5 0 0 1 5.5 7h-3A1.5 1.5 0 0 1 1 5.5v-3zm8 0A1.5 1.5 0 0 1 10.5 1h3A1.5 1.5 0 0 1 15 2.5v3A1.5 1.5 0 0 1 13.5 7h-3A1.5 1.5 0 0 1 9 5.5v-3zm-8 8A1.5 1.5 0 0 1 2.5 9h3A1.5 1.5 0 0 1 7 10.5v3A1.5 1.5 0 0 1 5.5 15h-3A1.5 1.5 0 0 1 1 13.5v-3zm8 0A1.5 1.5 0 0 1 10.5 9h3a1.5 1.5 0 0 1 1.5 1.5v3a1.5 1.5 0 0 1-1.5 1.5h-3A1.5 1.5 0 0 1 9 13.5v-3z"/></svg>
+      Format
+    </button>
+    <button class="tb-btn" id="downloadBtn" title="Download file">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/></svg>
+      Download
+    </button>
+    <button class="tb-btn" id="uploadBtn" title="Upload file">
+      <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1-.708.708L8.5 2.707V11.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/></svg>
+      Upload
+    </button>
+    <input type="file" id="uploadInput" style="display:none" accept=".c,.cpp,.py,.js,.sh,.html,.css,.r,.txt,.java">
+    <div class="tb-sep"></div>
+    <button class="tb-btn" id="fontDecBtn">A-</button>
+    <button class="tb-btn" id="fontIncBtn">A+</button>
+    <div class="tb-sep"></div>
+  </div>
+
+  <select class="lang-select" id="langSelect">
+    <option value="c">C</option>
+    <option value="cpp">C++</option>
+    <option value="python">Python 3</option>
+    <option value="java">Java</option>
+    <option value="javascript">JavaScript</option>
+    <option value="bash">Shell / Bash</option>
+    <option value="r">R</option>
+    <option value="html">HTML (Preview)</option>
+  </select>
+
+  <button class="tb-btn" id="keysBtn" style="margin-left:4px;">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M14 5a1 1 0 0 1 1 1v5a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1h12zM2 4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H2z"/><path d="M13 10.25a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm0-2a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm-5 0A.25.25 0 0 1 8.25 8h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5A.25.25 0 0 1 8 8.75v-.5zm2 0a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm-6 2A.25.25 0 0 1 4.25 10h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm2 0a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5zm2 0a.25.25 0 0 1 .25-.25h.5a.25.25 0 0 1 .25.25v.5a.25.25 0 0 1-.25.25h-.5a.25.25 0 0 1-.25-.25v-.5z"/></svg>
+    Keys
+  </button>
+  <button class="tb-btn" id="settingsBtn">
+    <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492zM5.754 8a2.246 2.246 0 1 1 4.492 0 2.246 2.246 0 0 1-4.492 0z"/><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.892 3.433-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.892-1.64-.901-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z"/></svg>
+  </button>
+
+  <!-- Real-time indicator -->
+  <div class="rt-badge" style="margin-left:4px;">
+    <div class="rt-badge-dot"></div>
+    LIVE
+  </div>
+
+  <!-- Local backend status -->
+  <div id="backendBadge" style="
+    display:inline-flex;align-items:center;gap:5px;
+    padding:3px 9px;border-radius:6px;font-size:11px;font-weight:700;
+    border:1px solid var(--border);background:var(--bg);color:var(--muted);
+    cursor:pointer;transition:all .2s;margin-left:2px;font-family:var(--sans);
+  " title="Click to check backend status" onclick="checkBackend()">
+    <span id="backendDot" style="width:6px;height:6px;border-radius:50%;background:#f59e0b;flex-shrink:0;"></span>
+    <span id="backendLabel">Backend</span>
+  </div>
+
+  <div class="tb-spacer"></div>
+
+  <!-- Profile -->
+  <div class="profile-area" id="profileArea">
+    <div class="online-dot"></div>
+    <div class="avatar" id="avatarEl">SK</div>
+    <div>
+      <div class="profile-name" id="profileNameEl">Suraj Kumar C S</div>
+      <div class="profile-role" id="profileRoleEl">Student &middot; BCU</div>
+    </div>
+    <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="color:var(--muted);margin-left:2px"><path d="M7.247 11.14 2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z"/></svg>
+
+    <div class="profile-dropdown" id="profileDropdown">
+      <div class="pd-header">
+        <div class="pd-name" id="pdName">Suraj Kumar C S</div>
+        <div class="pd-email" id="pdEmail">surajkumar@bcu.ac.in</div>
+        <div class="pd-source" id="pdSource">● Signed in via BCU Portal</div>
+      </div>
+      <div class="pd-item" id="editProfileBtn">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M12.146.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 0 1 0 .708l-10 10a.5.5 0 0 1-.168.11l-5 2a.5.5 0 0 1-.65-.65l2-5a.5.5 0 0 1 .11-.168l10-10zM11.207 2.5 13.5 4.793 14.793 3.5 12.5 1.207zm1.586 3L10.5 3.207 4 9.707V10h.5a.5.5 0 0 1 .5.5v.5h.5a.5.5 0 0 1 .5.5v.5h.293zm-9.761 5.175-.106.106-1.528 3.821 3.821-1.528.106-.106A.5.5 0 0 1 5 12.5V12h-.5a.5.5 0 0 1-.5-.5V11h-.5a.5.5 0 0 1-.468-.325z"/></svg>
+        Edit Profile
+      </div>
+      <div class="pd-item" id="settingsBtnDD">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4.754a3.246 3.246 0 1 0 0 6.492 3.246 3.246 0 0 0 0-6.492z"/><path d="M9.796 1.343c-.527-1.79-3.065-1.79-3.592 0l-.094.319a.873.873 0 0 1-1.255.52l-.292-.16c-1.64-.892-3.433.902-2.54 2.541l.159.292a.873.873 0 0 1-.52 1.255l-.319.094c-1.79.527-1.79 3.065 0 3.592l.319.094a.873.873 0 0 1 .52 1.255l-.16.292c-.892 1.64.901 3.434 2.541 2.54l.292-.159a.873.873 0 0 1 1.255.52l.094.319c.527 1.79 3.065 1.79 3.592 0l.094-.319a.873.873 0 0 1 1.255-.52l.292.16c1.64.892 3.433-.902 2.54-2.541l-.159-.292a.873.873 0 0 1 .52-1.255l.319-.094c1.79-.527 1.79-3.065 0-3.592l-.319-.094a.873.873 0 0 1-.52-1.255l.16-.292c.892-1.64-.901-3.433-2.541-2.54l-.292.159a.873.873 0 0 1-1.255-.52l-.094-.319z"/></svg>
+        Settings
+      </div>
+      <div class="pd-divider"></div>
+      <div class="pd-item red" id="signOutBtn">
+        <svg width="13" height="13" viewBox="0 0 16 16" fill="currentColor"><path d="M10 12.5a.5.5 0 0 1-.5.5h-8a.5.5 0 0 1-.5-.5v-9a.5.5 0 0 1 .5-.5h8a.5.5 0 0 1 .5.5v2a.5.5 0 0 0 1 0v-2A1.5 1.5 0 0 0 9.5 2h-8A1.5 1.5 0 0 0 0 3.5v9A1.5 1.5 0 0 0 1.5 14h8a1.5 1.5 0 0 0 1.5-1.5v-2a.5.5 0 0 0-1 0z"/><path d="M15.854 8.354a.5.5 0 0 0 0-.708l-3-3a.5.5 0 0 0-.708.708L14.293 7.5H5.5a.5.5 0 0 0 0 1h8.793l-2.147 2.146a.5.5 0 0 0 .708.708l3-3z"/></svg>
+        Sign Out
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ SHELL ══════════════════════════════════════════════ -->
+<div class="shell">
+
+  <!-- Description Panel -->
+  <div class="desc-panel" id="descPanel">
+    <div class="desc-header">
+      <svg width="14" height="14" viewBox="0 0 16 16" fill="var(--muted)"><path d="M5.5 7a.5.5 0 0 0 0 1h5a.5.5 0 0 0 0-1h-5zM5 9.5a.5.5 0 0 1 .5-.5h5a.5.5 0 0 1 0 1h-5a.5.5 0 0 1-.5-.5zm0 2a.5.5 0 0 1 .5-.5h2a.5.5 0 0 1 0 1h-2a.5.5 0 0 1-.5-.5z"/><path d="M9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4.5L9.5 0zm0 1v2A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5z"/></svg>
+      <div class="desc-header-title">Description</div>
+    </div>
+    <div class="desc-body" id="descBody"></div>
+  </div>
+
+  <!-- Horizontal Drag Handle -->
+  <div class="h-resize-bar" id="hResizeBar" title="Drag to resize panels">
+    <div class="h-resize-handle">
+      <div class="h-resize-dot"></div>
+      <div class="h-resize-dot"></div>
+      <div class="h-resize-dot"></div>
+      <div class="h-resize-dot"></div>
+      <div class="h-resize-dot"></div>
+      <div class="h-resize-dot"></div>
+    </div>
+  </div>
+
+  <!-- Editor area -->
+  <div class="editor-area">
+    <div class="file-tab-bar" id="fileTabBar"></div>
+
+    <div class="code-wrap" id="codeWrap">
+      <div class="editor-inner" id="editorInner">
+        <div class="gutter" id="gutter"></div>
+        <textarea class="code-ta" id="codeTA" spellcheck="false" autocorrect="off" autocapitalize="off"></textarea>
+      </div>
+      <iframe class="preview-frame" id="previewFrame" style="display:none;"></iframe>
+    </div>
+
+    <div class="status-bar">
+      <span id="sbLang">C</span>
+      <span id="sbFile">Sum.c</span>
+      <span id="sbBP" style="color:#d8b4fe;"></span>
+      <span class="sb-r">
+        <span id="sbLines">1 line</span>
+        <span id="sbCursor">Ln 1, Col 1</span>
+        <span>UTF-8</span>
+      </span>
+    </div>
+
+    <!-- Vertical Resize Bar (enhanced with drag handle) -->
+    <div class="resize-bar" id="resizeBar">
+      <span class="resize-bar-label">Output / Debugger</span>
+      <div class="resize-bar-handle">
+        <div class="resize-bar-dot"></div>
+        <div class="resize-bar-dot"></div>
+        <div class="resize-bar-dot"></div>
+      </div>
+    </div>
+
+    <!-- Bottom tabbed panel -->
+    <div class="bottom-wrap" id="bottomWrap">
+      <div class="panel-tabs">
+        <button class="panel-tab active" data-pane="compile" id="tabCompile">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 9a.5.5 0 0 1 .5-.5h3a.5.5 0 0 1 0 1h-3A.5.5 0 0 1 6 9zM3.854 4.146a.5.5 0 1 0-.708.708L4.793 6.5 3.146 8.146a.5.5 0 1 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2z"/><path d="M2 1a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V3a2 2 0 0 0-2-2zm12 1a1 1 0 0 1 1 1v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V3a1 1 0 0 1 1-1z"/></svg>
+          Output
+        </button>
+        <button class="panel-tab" data-pane="terminal" id="tabTerminal">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm9.5 5.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm-6.354-.354a.5.5 0 1 0 .708.708l2-2a.5.5 0 0 0 0-.708l-2-2a.5.5 0 1 0-.708.708L4.793 6.5 3.146 8.146z"/></svg>
+          Terminal
+        </button>
+        <button class="panel-tab" data-pane="evaluate" id="tabEvaluate" style="color:var(--pass);">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0zm-4.208 7-.896-.897.707-.707.543.543 6.646-6.647.708.708-7 7a.5.5 0 0 1-.708 0z"/></svg>
+          Evaluate
+          <span id="evalBadge" style="display:none;background:var(--pass);color:#fff;font-size:9px;padding:1px 5px;border-radius:99px;font-family:var(--sans);font-weight:800;"></span>
+        </button>
+        <button class="panel-tab dbg-tab" data-pane="debugger" id="tabDebugger">
+          <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 .278a.77.77 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/></svg>
+          Debugger
+          <span id="dbgBadge" style="display:none;background:var(--dbg);color:#fff;font-size:9px;padding:1px 5px;border-radius:99px;font-family:var(--sans);font-weight:800;"></span>
+        </button>
+        <div style="margin-left:auto;display:flex;align-items:center;gap:6px;">
+          <span id="compileStatus" style="font-size:11px;font-weight:700;color:var(--muted);"></span>
+        </div>
+      </div>
+
+      <!-- Output pane -->
+      <div class="panel-body">
+        <div class="panel-pane active" id="paneCompile">
+          <div class="compile-file" id="compileFile">Testing with file: Sum.c</div>
+          <div id="compileContent"></div>
+        </div>
+
+        <!-- ─── TERMINAL PANE ─── -->
+        <div class="panel-pane" id="paneTerminal" style="padding:0;overflow:hidden;flex-direction:column;">
+          <div class="terminal-wrap">
+            <div class="terminal-toolbar">
+              <span class="terminal-title">
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-1px;margin-right:4px;"><path d="M0 3a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2V3zm9.5 5.5h-3a.5.5 0 0 0 0 1h3a.5.5 0 0 0 0-1zm-6.354-.354a.5.5 0 1 0 .708.708L4.793 6.5 3.146 8.146z"/></svg>
+                TERMINAL — Real-time Compiler Output
+              </span>
+              <button class="terminal-btn" id="termCopyBtn" title="Copy output">
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M4 1.5H3a2 2 0 0 0-2 2V14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V3.5a2 2 0 0 0-2-2h-1v1h1a1 1 0 0 1 1 1V14a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1V3.5a1 1 0 0 1 1-1h1z"/><path d="M9.5 1a.5.5 0 0 1 .5.5v1a.5.5 0 0 1-.5.5h-3a.5.5 0 0 1-.5-.5v-1a.5.5 0 0 1 .5-.5z"/></svg>
+                Copy
+              </button>
+              <button class="terminal-btn" id="termClearBtn" title="Clear terminal">
+                <svg width="10" height="10" viewBox="0 0 16 16" fill="currentColor"><path d="M11 1.5v1h3.5a.5.5 0 0 1 0 1h-.538l-.853 10.66A2 2 0 0 1 11.115 16h-6.23a2 2 0 0 1-1.994-1.84L1.038 3.5H.5a.5.5 0 0 1 0-1H4v-1A1.5 1.5 0 0 1 5.5 0h5A1.5 1.5 0 0 1 11 1.5zm-2.5-.5h-3v1h3v-1zM4.5 5.029l.5 8.5a.5.5 0 1 0 .998-.06l-.5-8.5a.5.5 0 1 0-.998.06zm6.53-.528a.5.5 0 0 0-.528.47l-.5 8.5a.5.5 0 0 0 .998.058l.5-8.5a.5.5 0 0 0-.47-.528z"/></svg>
+                Clear
+              </button>
+              <span id="termStatus" style="font-size:10px;color:#56d364;font-weight:700;font-family:var(--sans);"></span>
+            </div>
+            <div class="terminal-output" id="termOutput">
+              <span class="term-line info">// Terminal ready. Click Run ▶ or press Ctrl+Enter to execute your code.</span>
+            </div>
+            <div class="terminal-stdin-row">
+              <span class="terminal-prompt">$&gt;</span>
+              <input class="terminal-stdin" id="termStdin" placeholder="Type stdin input here and press Enter to send to next run…" autocomplete="off" spellcheck="false">
+              <button class="terminal-send" id="termSendBtn">Send</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- ─── EVALUATE PANE ─── -->
+        <div class="panel-pane" id="paneEvaluate" style="padding:0;overflow:hidden;flex-direction:column;">
+          <div class="eval-wrap">
+            <div class="eval-header">
+              <span class="eval-title">Test Cases — <span id="evalFileName">Sum.c</span></span>
+              <span class="eval-score" id="evalScore">—</span>
+              <button class="eval-btn run-all" id="evalRunAllBtn">
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
+                Run All
+              </button>
+              <button class="eval-btn add-tc" id="evalAddTcBtn">
+                <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/></svg>
+                Add Case
+              </button>
+            </div>
+            <div class="eval-body" id="evalBody"></div>
+            <div class="eval-summary" id="evalSummary" style="display:none;">
+              <div class="eval-progress"><div class="eval-progress-bar" id="evalProgressBar" style="width:0%"></div></div>
+              <span id="evalSummaryText" style="white-space:nowrap;"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Debugger pane -->
+        <div class="panel-pane" id="paneDebugger" style="padding:0;overflow:hidden;flex-direction:column;">
+          <div class="dbg-controls" id="dbgControls">
+            <button class="dbg-ctrl-btn step" id="dbgStart" title="Start debugging">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M10.804 8 5 4.633v6.734zm.792-.696a.802.802 0 0 1 0 1.392l-6.363 3.692C4.713 12.69 4 12.345 4 11.692V4.308c0-.653.713-.998 1.233-.696z"/></svg>
+              Start
+            </button>
+            <button class="dbg-ctrl-btn step" id="dbgStepOver" disabled title="Step Over (F10)">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M9.5 3.5a6 6 0 0 1 5.998 6.496A6 6 0 0 1 3.707 13.5H3.5a.5.5 0 0 1 0-1h.207A5 5 0 0 0 13.5 9.5c0-2.796-1.964-5.139-4.712-5.5C8.784 3.962 8.5 3.757 8.5 3.5a.5.5 0 0 1 .5-.5h.5z"/><path d="M8.354 1.146a.5.5 0 0 0-.708 0l-2 2a.5.5 0 1 0 .708.708L8 2.207l1.646 1.647a.5.5 0 0 0 .708-.708l-2-2z"/></svg>
+              Step Over
+            </button>
+            <button class="dbg-ctrl-btn step" id="dbgStepIn" disabled title="Step Into (F11)">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 3.5a.5.5 0 0 1 .5.5v4.793l1.146-1.147a.5.5 0 0 1 .708.708l-2 2a.5.5 0 0 1-.708 0l-2-2a.5.5 0 0 1 .708-.708L7.5 8.793V4a.5.5 0 0 1 .5-.5z"/><path d="M2 14a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 14z"/></svg>
+              Step In
+            </button>
+            <button class="dbg-ctrl-btn step" id="dbgStepOut" disabled title="Step Out (Shift+F11)">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="M8 12.5a.5.5 0 0 1-.5-.5V7.207L6.354 8.354a.5.5 0 0 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.207V12a.5.5 0 0 1-.5.5z"/><path d="M2 2a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11A.5.5 0 0 1 2 2z"/></svg>
+              Step Out
+            </button>
+            <button class="dbg-ctrl-btn" id="dbgContinue" disabled style="color:var(--pass);border-color:var(--pass-border);background:var(--pass-bg);" title="Continue (F5)">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg>
+              Continue
+            </button>
+            <button class="dbg-ctrl-btn" id="dbgStop" disabled style="color:var(--fail);border-color:var(--fail-border);background:var(--fail-bg);" title="Stop">
+              <svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><rect width="10" height="10" x="3" y="3" rx="1"/></svg>
+              Stop
+            </button>
+            <span class="dbg-status" id="dbgStatus">Ready</span>
+          </div>
+
+          <div class="dbg-layout" style="padding:10px 12px;flex:1;overflow:hidden;" id="dbgLayout">
+            <div class="dbg-col-left" id="dbgColLeft">
+              <!-- Call Stack -->
+              <div class="dbg-section">
+                <div class="dbg-section-hdr">
+                  <span>Call Stack</span>
+                  <span id="dbgStackCount" style="font-size:10px;background:var(--bg);padding:1px 7px;border-radius:99px;border:1px solid var(--border);">0 frames</span>
+                </div>
+                <div class="dbg-section-body" id="dbgStack">
+                  <div style="color:var(--muted);font-size:11.5px;">No active debug session</div>
+                </div>
+              </div>
+              <!-- Debug Console -->
+              <div class="dbg-section">
+                <div class="dbg-section-hdr">
+                  <span>Debug Console</span>
+                  <button onclick="document.getElementById('dbgConsole').textContent=''" style="border:none;background:none;font-size:10px;color:var(--muted);cursor:pointer;font-family:var(--sans);font-weight:700;">Clear</button>
+                </div>
+                <div class="dbg-section-body">
+                  <div class="dbg-console" id="dbgConsole"><span class="dbg-info">&gt; Debugger ready. Click breakpoints in the gutter, then click Start.</span>
+</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Debugger columns horizontal drag -->
+            <div class="dbg-h-resize" id="dbgHResize" title="Drag to resize"></div>
+
+            <div class="dbg-col-right" id="dbgColRight">
+              <!-- Variables -->
+              <div class="dbg-section">
+                <div class="dbg-section-hdr">Variables</div>
+                <div class="dbg-section-body" id="dbgVars">
+                  <div style="color:var(--muted);font-size:11.5px;">Not running</div>
+                </div>
+              </div>
+              <!-- Breakpoints -->
+              <div class="dbg-section">
+                <div class="dbg-section-hdr">
+                  <span>Breakpoints</span>
+                  <button id="clearBpsBtn" style="border:none;background:none;font-size:10px;color:var(--muted);cursor:pointer;font-family:var(--sans);font-weight:700;">Clear all</button>
+                </div>
+                <div class="dbg-section-body" id="dbgBreakpoints">
+                  <div class="bp-empty">No breakpoints set</div>
+                </div>
+              </div>
+              <!-- Watch -->
+              <div class="dbg-section">
+                <div class="dbg-section-hdr">Watch Expressions</div>
+                <div class="dbg-section-body">
+                  <div class="watch-input-row">
+                    <input type="text" class="watch-input" id="watchInput" placeholder="e.g. num, sum">
+                    <button class="watch-add-btn" id="watchAddBtn">+</button>
+                  </div>
+                  <div id="watchList"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ MODALS ══════════════════════════════════════════════ -->
+
+<!-- New File -->
+<div class="modal-overlay" id="modalNewFile">
+  <div class="modal">
+    <h3>New File</h3>
+    <div>
+      <label>File Name</label>
+      <input type="text" id="newFileName" placeholder="e.g. solution.py">
+    </div>
+    <div>
+      <label>Language</label>
+      <select id="newFileLang">
+        <option value="c">C</option>
+        <option value="cpp">C++</option>
+        <option value="python">Python 3</option>
+        <option value="java">Java</option>
+        <option value="javascript">JavaScript</option>
+        <option value="bash">Shell / Bash</option>
+        <option value="r">R</option>
+        <option value="html">HTML (Preview)</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="newFileCancel">Cancel</button>
+      <button class="btn-primary" id="newFileCreate">Create File</button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Profile -->
+<div class="modal-overlay" id="modalProfile">
+  <div class="modal">
+    <h3>Edit Profile</h3>
+    <div>
+      <label>Display Name</label>
+      <input type="text" id="editName">
+    </div>
+    <div>
+      <label>Email</label>
+      <input type="email" id="editEmail">
+    </div>
+    <div>
+      <label>Role</label>
+      <input type="text" id="editRole">
+    </div>
+    <div class="modal-btns">
+      <button class="btn-cancel" id="profileCancel">Cancel</button>
+      <button class="btn-primary" id="profileSave">Save</button>
+    </div>
+  </div>
+</div>
+
+<!-- Keyboard Shortcuts -->
+<div class="modal-overlay" id="modalKeys">
+  <div class="modal" style="width:430px;">
+    <h3>Keyboard Shortcuts</h3>
+    <table style="width:100%;border-collapse:collapse;font-size:12.5px;">
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:9px 4px;font-weight:700;color:var(--text);">Run code</td>
+        <td style="padding:9px 4px;text-align:right;"><span class="kbd">Ctrl+Enter</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:9px 4px;font-weight:700;color:var(--text);">Evaluate test cases</td>
+        <td style="padding:9px 4px;text-align:right;"><span class="kbd">Ctrl+E</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:9px 4px;font-weight:700;color:var(--text);">Debug</td>
+        <td style="padding:9px 4px;text-align:right;"><span class="kbd">Ctrl+D</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:9px 4px;font-weight:700;color:var(--text);">Save</td>
+        <td style="padding:9px 4px;text-align:right;"><span class="kbd">Ctrl+S</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:9px 4px;font-weight:700;color:var(--text);">New file</td>
+        <td style="padding:9px 4px;text-align:right;"><span class="kbd">Ctrl+N</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:9px 4px;font-weight:700;color:var(--text);">Step over (debug)</td>
+        <td style="padding:9px 4px;text-align:right;"><span class="kbd">F10</span></td>
+      </tr>
+      <tr style="border-bottom:1px solid var(--border);">
+        <td style="padding:9px 4px;font-weight:700;color:var(--text);">Step into (debug)</td>
+        <td style="padding:9px 4px;text-align:right;"><span class="kbd">F11</span></td>
+      </tr>
+      <tr>
+        <td style="padding:9px 4px;font-weight:700;color:var(--text);">Continue (debug)</td>
+        <td style="padding:9px 4px;text-align:right;"><span class="kbd">F5</span></td>
+      </tr>
+    </table>
+    <div class="modal-btns">
+      <button class="btn-primary" id="keysClose">Close</button>
+    </div>
+  </div>
+</div>
+
+<!-- Settings -->
+<div class="settings-overlay" id="settingsOverlay">
+  <div class="settings-box">
+    <div class="settings-hdr">
+      <h2>Settings</h2>
+      <button class="settings-close" id="settingsClose">&#x2715;</button>
+    </div>
+
+    <!-- Appearance -->
+    <div class="settings-section">
+      <h4>Appearance</h4>
+      <div class="settings-row">
+        <div>
+          <div class="settings-label">Theme</div>
+          <div class="settings-sub">Choose light or dark interface</div>
+        </div>
+        <div class="theme-pills">
+          <button class="theme-pill active" id="themeLightBtn">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M8 11a3 3 0 1 1 0-6 3 3 0 0 1 0 6zm0 1a4 4 0 1 0 0-8 4 4 0 0 0 0 8zM8 0a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 0zm0 13a.5.5 0 0 1 .5.5v2a.5.5 0 0 1-1 0v-2A.5.5 0 0 1 8 13zm8-5a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2a.5.5 0 0 1 .5.5zM3 8a.5.5 0 0 1-.5.5h-2a.5.5 0 0 1 0-1h2A.5.5 0 0 1 3 8z"/></svg>
+            Light
+          </button>
+          <button class="theme-pill" id="themeDarkBtn">
+            <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="M6 .278a.768.768 0 0 1 .08.858 7.208 7.208 0 0 0-.878 3.46c0 4.021 3.278 7.277 7.318 7.277.527 0 1.04-.055 1.533-.16a.787.787 0 0 1 .81.316.733.733 0 0 1-.031.893A8.349 8.349 0 0 1 8.344 16C3.734 16 0 12.286 0 7.71 0 4.266 2.114 1.312 5.124.06A.752.752 0 0 1 6 .278z"/></svg>
+            Dark
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Editor -->
+    <div class="settings-section" style="border-top:1px solid var(--border);">
+      <h4>Editor</h4>
+      <div class="settings-row">
+        <div><div class="settings-label">Word Wrap</div><div class="settings-sub">Wrap long lines</div></div>
+        <label class="toggle"><input type="checkbox" id="wrapToggle"><span class="toggle-track"></span></label>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Font Size</div><div class="settings-sub">Current: <span id="fontSizeLbl">13</span>px</div></div>
+        <div style="display:flex;gap:6px;">
+          <button class="btn-cancel" id="sFontDec" style="height:28px;padding:0 10px;font-size:12px;">-</button>
+          <button class="btn-primary" id="sFontInc" style="height:28px;padding:0 10px;font-size:12px;">+</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Compiler -->
+    <div class="settings-section" style="border-top:1px solid var(--border);">
+      <h4>Compiler</h4>
+      <div class="settings-row">
+        <div><div class="settings-label">Compiler</div><div class="settings-sub">Powered by Piston API (emkc.org) — Real execution</div></div>
+        <span style="font-size:12px;font-weight:700;color:var(--pass);">&#x25cf; Online</span>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Timeout</div><div class="settings-sub">Max execution time</div></div>
+        <span style="font-size:12px;font-weight:700;color:var(--muted);">5 000 ms</span>
+      </div>
+    </div>
+
+    <!-- Debugger -->
+    <div class="settings-section" style="border-top:1px solid var(--border);">
+      <h4>Debugger</h4>
+      <div class="settings-row">
+        <div><div class="settings-label">Show Gutter Breakpoints</div><div class="settings-sub">Click line numbers to set</div></div>
+        <span style="font-size:12px;font-weight:700;color:var(--pass);">&#x25cf; Active</span>
+      </div>
+      <div class="settings-row">
+        <div><div class="settings-label">Simulated Debugger</div><div class="settings-sub">Step-through trace for C, Python, JS</div></div>
+        <label class="toggle"><input type="checkbox" id="dbgSimToggle" checked><span class="toggle-track"></span></label>
+      </div>
+    </div>
+
+    <!-- Session -->
+    <div class="settings-section" style="border-top:1px solid var(--border);">
+      <h4>Session</h4>
+      <div class="settings-row">
+        <div><div class="settings-label">Logged In As</div><div class="settings-sub" id="settingsUserEmail">—</div></div>
+        <span id="settingsLoginBadge" style="font-size:11px;font-weight:700;background:var(--pass-bg);color:var(--pass);border:1px solid var(--pass-border);padding:3px 9px;border-radius:99px;">Active</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"><span id="toastIcon">&#x2713;</span><span id="toastMsg">Saved!</span></div>
+
+<script>
+// ═══════════════════════════════════════════════════════════
+//  CONSTANTS & STARTERS
+// ═══════════════════════════════════════════════════════════
+const LANG_META = {
+  c:          {label:'C',          ext:'c',    piston:'c',          file:'Sum.c',      preview:false},
+  cpp:        {label:'C++',        ext:'cpp',  piston:'c++',        file:'main.cpp',   preview:false},
+  python:     {label:'Python 3',   ext:'py',   piston:'python',     file:'main.py',    preview:false},
+  java:       {label:'Java',       ext:'java', piston:'java',       file:'Main.java',  preview:false},
+  javascript: {label:'JavaScript', ext:'js',   piston:'javascript', file:'main.js',    preview:false},
+  bash:       {label:'Shell',      ext:'sh',   piston:'bash',       file:'main.sh',    preview:false},
+  r:          {label:'R',          ext:'r',    piston:'r',          file:'main.r',     preview:false},
+  html:       {label:'HTML',       ext:'html', piston:null,         file:'index.html', preview:true},
+};
+
+// Default test cases per language (used when creating new files)
+const DEFAULT_TESTS = {
+  c:          [{name:'Test 1',input:'1',expected:'1'},{name:'Test 2',input:'45',expected:'9'},{name:'Test 3',input:'12345',expected:'15'}],
+  cpp:        [{name:'Test 1',input:'1',expected:'1'},{name:'Test 2',input:'45',expected:'9'},{name:'Test 3',input:'12345',expected:'15'}],
+  python:     [{name:'Test 1',input:'1',expected:'1'},{name:'Test 2',input:'45',expected:'9'},{name:'Test 3',input:'12345',expected:'15'}],
+  java:       [{name:'Test 1',input:'1',expected:'1'},{name:'Test 2',input:'45',expected:'9'},{name:'Test 3',input:'12345',expected:'15'}],
+  javascript: [{name:'Test 1',input:'1',expected:'1'},{name:'Test 2',input:'45',expected:'9'},{name:'Test 3',input:'12345',expected:'15'}],
+  bash:       [{name:'Test 1',input:'1',expected:'1'},{name:'Test 2',input:'45',expected:'9'},{name:'Test 3',input:'12345',expected:'15'}],
+  r:          [{name:'Test 1',input:'1',expected:'1'},{name:'Test 2',input:'45',expected:'9'},{name:'Test 3',input:'12345',expected:'15'}],
+  html:       [],
+};
+// Keep SUM_TESTS alias for backward compat
+const SUM_TESTS = DEFAULT_TESTS.c;
+
+const STARTERS = {
+  c:`#include <stdio.h>
+
+int main()
+{
+    int num, sum = 0, digit;
+    scanf("%d", &num);
+    while (num > 0)
+    {
+        digit = num % 10;
+        sum   = sum + digit;
+        num   = num / 10;
+    }
+    printf("%d", sum);
+    return 0;
+}`,
+  cpp:`#include <iostream>
+using namespace std;
+int main() {
+    int num, sum = 0, digit;
+    cin >> num;
+    while (num > 0) {
+        digit = num % 10;
+        sum  += digit;
+        num  /= 10;
+    }
+    cout << sum;
+    return 0;
+}`,
+  python:`num = int(input())
+total = 0
+while num > 0:
+    total += num % 10
+    num   //= 10
+print(total)`,
+  java:`import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner sc = new Scanner(System.in);
+        int num = sc.nextInt(), sum = 0;
+        while (num > 0) { sum += num % 10; num /= 10; }
+        System.out.print(sum);
+    }
+}`,
+  javascript:`const num = parseInt(require('fs').readFileSync('/dev/stdin','utf8').trim());
+let n = num, s = 0;
+while (n > 0) { s += n % 10; n = Math.floor(n / 10); }
+process.stdout.write(String(s));`,
+  bash:`#!/bin/bash
+read num; s=0
+while [ $num -gt 0 ]; do
+  s=$((s + num % 10))
+  num=$((num / 10))
+done
+echo -n $s`,
+  r:`num <- as.integer(readLines("stdin",n=1))
+s <- 0
+while (num > 0) { s <- s + num %% 10; num <- num %/% 10 }
+cat(s)`,
+  html:`<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Page</title>
+  <style>
+    body { font-family: 'DM Sans', sans-serif; background:#f4f4f4;
+           display:grid; place-items:center; min-height:100vh; }
+    .card { background:#fff; border:1px solid #e0e0e0; border-radius:16px;
+            padding:40px; text-align:center; box-shadow:0 8px 40px rgba(0,0,0,.09); }
+    h1 { font-size:2rem; margin-bottom:8px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Hello, World!</h1>
+    <p>Edit this file and click Run to preview.</p>
+  </div>
+</body>
+</html>`,
+};
+
+// ═══════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════
+let files   = [{id:1, lang:'c', name:'Sum.c', code:STARTERS.c, customInput:'', breakpoints:new Set(),
+               testCases: DEFAULT_TESTS.c.map((t,i)=>({...t,id:i+1,output:'',status:'ready'}))}];
+let activeId = 1;
+let nextId   = 2;
+let pistonVer = {};
+let fontSize  = 13;
+let watchExprs = [];
+let dbgSession = null;
+let currentTheme = 'light';
+
+// ─── DEFAULT PROFILE ───
+let userProfile = {
+  name: 'Student User',
+  email: 'student@bcu.ac.in',
+  role: 'Student · BCU',
+  source: 'BCU Portal'
+};
+
+// ─── LOAD FROM LOCALSTORAGE (real-time login sync) ───
+(function loadSession() {
+  try {
+    const stored = localStorage.getItem('vpl_user');
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      if (parsed && parsed.name) {
+        userProfile = { ...userProfile, ...parsed };
+      }
+    }
+    // Load theme preference
+    const storedTheme = localStorage.getItem('vpl_theme');
+    if (storedTheme === 'dark' || storedTheme === 'light') {
+      currentTheme = storedTheme;
+    }
+  } catch(e) { /* ignore */ }
+})();
+
+
+// ═══════════════════════════════════════════════════════════
+//  DOM REFS
+// ═══════════════════════════════════════════════════════════
+const $ = id => document.getElementById(id);
+const runBtn      = $('runBtn');
+const debugBtn    = $('debugBtn');
+const evalBtn     = $('evalBtn');
+const saveBtn     = $('saveBtn');
+const saveDot     = $('saveDot');
+const resetBtn    = $('resetBtn');
+const copyBtn     = $('copyBtn');
+const fmtBtn      = $('fmtBtn');
+const downloadBtn = $('downloadBtn');
+const uploadBtn   = $('uploadBtn');
+const uploadInput = $('uploadInput');
+const fontDecBtn  = $('fontDecBtn');
+const fontIncBtn  = $('fontIncBtn');
+const langSelect  = $('langSelect');
+const newFileBtn  = $('newFileBtn');
+const keysBtn     = $('keysBtn');
+const settingsBtn = $('settingsBtn');
+const fileTabBar  = $('fileTabBar');
+const gutter      = $('gutter');
+const codeTA      = $('codeTA');
+const previewFrame= $('previewFrame');
+const editorInner = $('editorInner');
+const statusSbLang= $('sbLang');
+const statusSbFile= $('sbFile');
+const sbLines     = $('sbLines');
+const sbCursor    = $('sbCursor');
+const sbBP        = $('sbBP');
+const descBody    = $('descBody');
+const compileFile = $('compileFile');
+const compileContent=$('compileContent');
+const compileStatus=$('compileStatus');
+const profileArea = $('profileArea');
+
+// Sign Out — clears session and redirects to your login page
+$('signOutBtn').addEventListener('click', () => {
+  if (!confirm('Sign out of VPL?')) return;
+  profileArea.classList.remove('open');
+  localStorage.removeItem('vpl_user');
+  localStorage.removeItem('vpl_theme');
+  // Redirect back to your login page
+  window.location.href = 'login_page.html';
+});
+
+// ═══════════════════════════════════════════════════════════
+//  THEME
+// ═══════════════════════════════════════════════════════════
+function applyTheme(theme) {
+  currentTheme = theme;
+  document.documentElement.setAttribute('data-theme', theme);
+  localStorage.setItem('vpl_theme', theme);
+
+  const lightBtn = $('themeLightBtn');
+  const darkBtn  = $('themeDarkBtn');
+  if (theme === 'dark') {
+    darkBtn.classList.add('active');
+    lightBtn.classList.remove('active');
+  } else {
+    lightBtn.classList.add('active');
+    darkBtn.classList.remove('active');
+  }
+}
+
+$('themeLightBtn').addEventListener('click', () => { applyTheme('light'); toast('Light theme applied', '☀️', 1200); });
+$('themeDarkBtn').addEventListener('click',  () => { applyTheme('dark');  toast('Dark theme applied', '🌑', 1200); });
+
+// Apply saved theme on load
+applyTheme(currentTheme);
+
+// ═══════════════════════════════════════════════════════════
+//  TOOLS TOGGLE
+// ═══════════════════════════════════════════════════════════
+const toolsToggleBtn = $('toolsToggleBtn');
+const toolsGroup     = $('toolsGroup');
+toolsToggleBtn.addEventListener('click', () => {
+  const open = toolsGroup.classList.toggle('open');
+  toolsToggleBtn.classList.toggle('open', open);
+});
+
+
+let toastTimer;
+function toast(msg, icon='✓', ms=2200) {
+  clearTimeout(toastTimer);
+  $('toastMsg').textContent = msg;
+  $('toastIcon').textContent = icon;
+  const t = $('toast');
+  t.classList.add('show');
+  toastTimer = setTimeout(() => t.classList.remove('show'), ms);
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PANEL TABS
+// ═══════════════════════════════════════════════════════════
+document.querySelectorAll('.panel-tab').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.panel-tab').forEach(b => b.classList.remove('active'));
+    document.querySelectorAll('.panel-pane').forEach(p => p.classList.remove('active'));
+    btn.classList.add('active');
+    $('pane' + capitalize(btn.dataset.pane)).classList.add('active');
+  });
+});
+function capitalize(s) { return s.charAt(0).toUpperCase() + s.slice(1); }
+function switchPane(pane) {
+  document.querySelectorAll('.panel-tab').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.panel-pane').forEach(p => p.classList.remove('active'));
+  const tabEl = document.querySelector('[data-pane="'+pane+'"]');
+  if (tabEl) tabEl.classList.add('active');
+  const paneEl = $('pane' + capitalize(pane));
+  if (paneEl) paneEl.classList.add('active');
+  if (pane === 'evaluate') renderEvaluatePane();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  PROFILE
+// ═══════════════════════════════════════════════════════════
+function applyProfile() {
+  const initials = userProfile.name.split(' ').filter(Boolean).map(w=>w[0].toUpperCase()).slice(0,2).join('');
+  $('avatarEl').textContent = initials;
+  $('profileNameEl').textContent = userProfile.name;
+  $('profileRoleEl').textContent  = userProfile.role;
+  $('pdName').textContent  = userProfile.name;
+  $('pdEmail').textContent = userProfile.email;
+  $('pdSource').textContent = '● Signed in via ' + (userProfile.source || 'BCU Portal');
+  $('settingsUserEmail').textContent = userProfile.email;
+}
+
+profileArea.addEventListener('click', e => { e.stopPropagation(); profileArea.classList.toggle('open'); });
+document.addEventListener('click', () => profileArea.classList.remove('open'));
+
+$('editProfileBtn').addEventListener('click', () => {
+  profileArea.classList.remove('open');
+  $('editName').value  = userProfile.name;
+  $('editEmail').value = userProfile.email;
+  $('editRole').value  = userProfile.role;
+  $('modalProfile').classList.add('open');
+});
+$('profileCancel').addEventListener('click', () => $('modalProfile').classList.remove('open'));
+$('profileSave').addEventListener('click', () => {
+  userProfile.name  = $('editName').value.trim()  || userProfile.name;
+  userProfile.email = $('editEmail').value.trim() || userProfile.email;
+  userProfile.role  = $('editRole').value.trim()  || userProfile.role;
+  applyProfile();
+  // Persist to localStorage
+  localStorage.setItem('vpl_user', JSON.stringify(userProfile));
+  $('modalProfile').classList.remove('open');
+  toast('Profile updated', '👤');
+});
+$('settingsBtnDD').addEventListener('click', () => { profileArea.classList.remove('open'); $('settingsOverlay').classList.add('open'); });
+
+// ═══════════════════════════════════════════════════════════
+//  ACTIVE FILE
+// ═══════════════════════════════════════════════════════════
+function activeFile() { return files.find(f => f.id === activeId); }
+function isSumFile(f) { return f && !LANG_META[f.lang].preview; }  // All non-preview files support evaluation
+
+// ═══════════════════════════════════════════════════════════
+//  TABS
+// ═══════════════════════════════════════════════════════════
+function renderTabs() {
+  fileTabBar.innerHTML = files.map(f => `
+    <div class="file-tab ${f.id===activeId?'active':''}" data-id="${f.id}">
+      ${esc(f.name)}
+      ${files.length>1?`<span class="tab-x" data-close="${f.id}">&times;</span>`:''}
+    </div>`).join('');
+  fileTabBar.querySelectorAll('.file-tab').forEach(el => {
+    el.addEventListener('click', e => {
+      if (e.target.dataset.close) return closeTab(+e.target.dataset.close);
+      saveActiveCode(); activeId = +el.dataset.id;
+      renderTabs(); renderEditor(); renderDesc(); renderReadyTable(); renderEvaluatePane();
+    });
+  });
+  fileTabBar.querySelectorAll('[data-close]').forEach(el => {
+    el.addEventListener('click', e => { e.stopPropagation(); closeTab(+el.dataset.close); });
+  });
+}
+function closeTab(id) {
+  if (files.length === 1) return;
+  files = files.filter(f => f.id !== id);
+  if (activeId === id) activeId = files[files.length-1].id;
+  renderTabs(); renderEditor(); renderDesc(); renderReadyTable(); renderEvaluatePane();
+}
+
+// ═══════════════════════════════════════════════════════════
+//  EDITOR
+// ═══════════════════════════════════════════════════════════
+function renderEditor() {
+  const f = activeFile();
+  const m = LANG_META[f.lang];
+  langSelect.value = f.lang;
+  statusSbLang.textContent = m.label;
+  statusSbFile.textContent = f.name;
+  compileFile.textContent  = 'Testing with file: ' + f.name;
+  saveDot.classList.remove('dirty');
+  if (m.preview) {
+    editorInner.style.display = 'none';
+    previewFrame.style.display = 'flex';
+    codeTA.value = f.code;
+    updatePreview(f);
+  } else {
+    editorInner.style.display = 'flex';
+    previewFrame.style.display = 'none';
+    codeTA.value = f.code;
+    renderGutter(); updateCursor();
+  }
+  updateBPStatus();
+}
+function updatePreview(f) {
+  previewFrame.srcdoc = f.code;
+}
+function saveActiveCode() {
+  const f = activeFile();
+  if (f) f.code = codeTA.value;
+}
+function onCodeChange() {
+  const f = activeFile();
+  if (f) f.code = codeTA.value;
+  renderGutter();
+  saveDot.classList.add('dirty');
+}
+
+// ── GUTTER ──
+function renderGutter() {
+  const f = activeFile();
+  const lines = codeTA.value.split('\n');
+  sbLines.textContent = lines.length + ' line' + (lines.length!==1?'s':'');
+  gutter.innerHTML = lines.map((_,i) => {
+    const ln = i+1;
+    const hasBP = f && f.breakpoints.has(ln);
+    return `<span class="gutter-line${hasBP?' bp':''}" data-ln="${ln}">${ln}</span>`;
+  }).join('\n');
+  gutter.querySelectorAll('.gutter-line').forEach(el => {
+    el.addEventListener('click', () => toggleBreakpoint(+el.dataset.ln));
+  });
+  syncGutter();
+}
+function syncGutter() { gutter.scrollTop = codeTA.scrollTop; }
+function toggleBreakpoint(ln) {
+  const f = activeFile();
+  if (!f) return;
+  if (f.breakpoints.has(ln)) f.breakpoints.delete(ln);
+  else f.breakpoints.add(ln);
+  renderGutter(); renderBreakpointsList(); updateBPStatus();
+  toast(f.breakpoints.has(ln)?`Breakpoint removed at line ${ln}`:`Breakpoint set at line ${ln}`, '🔴', 1400);
+}
+function updateBPStatus() {
+  const f = activeFile();
+  const n = f ? f.breakpoints.size : 0;
+  sbBP.textContent = n > 0 ? n + ' breakpoint' + (n!==1?'s':'') : '';
+  const badge = $('dbgBadge');
+  if (n > 0) { badge.textContent = n; badge.style.display = 'inline-block'; }
+  else badge.style.display = 'none';
+}
+function updateCursor() {
+  const txt = codeTA.value.substring(0, codeTA.selectionStart);
+  const rows = txt.split('\n');
+  sbCursor.textContent = 'Ln ' + rows.length + ', Col ' + (rows[rows.length-1].length+1);
+}
+
+// ── KEY HANDLER ──
+codeTA.addEventListener('keydown', e => {
+  if (e.key === 'Tab') {
+    e.preventDefault();
+    const s = codeTA.selectionStart, v = codeTA.value;
+    codeTA.value = v.slice(0,s) + '    ' + v.slice(codeTA.selectionEnd);
+    codeTA.selectionStart = codeTA.selectionEnd = s+4;
+    renderGutter();
+  }
+  if (e.ctrlKey && e.key === 'Enter') { e.preventDefault(); runCode(); }
+  if (e.ctrlKey && e.key.toLowerCase() === 'd') { e.preventDefault(); startDebug(); }
+  if (e.ctrlKey && e.key.toLowerCase() === 'e') { e.preventDefault(); evaluateAll(); }
+  if (e.ctrlKey && e.key.toLowerCase() === 's') { e.preventDefault(); saveCode(); }
+  if (e.ctrlKey && e.key.toLowerCase() === 'n') { e.preventDefault(); openNewFile(); }
+  if (e.key === 'F10') { e.preventDefault(); dbgStepOver(); }
+  if (e.key === 'F11') { e.preventDefault(); dbgStepIn(); }
+  if (e.key === 'F5')  { e.preventDefault(); dbgContinue(); }
+});
+codeTA.addEventListener('input', onCodeChange);
+codeTA.addEventListener('scroll', syncGutter);
+codeTA.addEventListener('click', updateCursor);
+codeTA.addEventListener('keyup', updateCursor);
+
+// ── LANG CHANGE ──
+langSelect.addEventListener('change', () => {
+  const f = activeFile(); const lang = langSelect.value;
+  f.lang = lang; f.name = LANG_META[lang].file;
+  f.code = STARTERS[lang] || ''; f.breakpoints = new Set();
+  f.testCases = (DEFAULT_TESTS[lang]||[]).map((t,i)=>({...t,id:i+1,output:'',status:'ready'}));
+  renderTabs(); renderEditor(); renderDesc(); renderReadyTable(); renderEvaluatePane();
+});
+
+// ── RESET ──
+resetBtn.addEventListener('click', () => {
+  if (!confirm('Reset code to starter template?')) return;
+  const f = activeFile();
+  f.code = STARTERS[f.lang] || ''; f.breakpoints = new Set();
+  codeTA.value = f.code; renderGutter(); renderReadyTable();
+  if (LANG_META[f.lang].preview) updatePreview(f);
+  toast('Code reset', '↺');
+});
+
+// ── SAVE ──
+function saveCode() {
+  saveActiveCode(); saveDot.classList.remove('dirty');
+  toast('Saved!', '💾', 1500);
+}
+saveBtn.addEventListener('click', saveCode);
+
+// ── COPY ──
+copyBtn.addEventListener('click', () => {
+  navigator.clipboard.writeText(codeTA.value)
+    .then(() => toast('Copied!', '📋', 1500))
+    .catch(() => toast('Copy failed', '✕'));
+});
+
+// ── FORMAT ──
+fmtBtn.addEventListener('click', () => {
+  const lines = codeTA.value.split('\n');
+  let indent = 0;
+  const out = lines.map(line => {
+    const t = line.trim();
+    if (!t) return '';
+    if (t === '}' || t === '};') indent = Math.max(0, indent-1);
+    const r = '    '.repeat(indent) + t;
+    if (t.endsWith('{')) indent++;
+    return r;
+  });
+  const newCode = out.join('\n');
+  codeTA.value = newCode;
+  const f = activeFile(); if (f) f.code = newCode;
+  renderGutter(); toast('Formatted!', '✨', 1400);
+});
+
+// ── DOWNLOAD ──
+downloadBtn.addEventListener('click', () => {
+  const f = activeFile();
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([f.code],{type:'text/plain'}));
+  a.download = f.name; a.click();
+  URL.revokeObjectURL(a.href);
+  toast('Downloaded ' + f.name, '⬇️', 1800);
+});
+
+// ── UPLOAD ──
+uploadBtn.addEventListener('click', () => uploadInput.click());
+uploadInput.addEventListener('change', e => {
+  const file = e.target.files[0]; if (!file) return;
+  const reader = new FileReader();
+  reader.onload = ev => {
+    const ext = file.name.split('.').pop().toLowerCase();
+    const lm = {c:'c',cpp:'cpp',py:'python',js:'javascript',sh:'bash',html:'html',css:'html',r:'r',java:'java'};
+    const lang = lm[ext] || 'c';
+    saveActiveCode();
+    const f = {id:nextId++, lang, name:file.name, code:ev.target.result, customInput:'', breakpoints:new Set(),
+               testCases:(DEFAULT_TESTS[lang]||[]).map((t,i)=>({...t,id:i+1,output:'',status:'ready'}))};
+    files.push(f); activeId = f.id;
+    renderTabs(); renderEditor(); renderDesc(); renderReadyTable(); renderEvaluatePane();
+    toast('Uploaded ' + file.name, '⬆️');
+  };
+  reader.readAsText(file); e.target.value = '';
+});
+
+// ── FONT SIZE ──
+function changeFontSize(d) {
+  fontSize = Math.max(10, Math.min(22, fontSize+d));
+  codeTA.style.fontSize = fontSize + 'px';
+  gutter.style.fontSize = fontSize + 'px';
+  codeTA.style.lineHeight = '1.7';
+  $('fontSizeLbl').textContent = fontSize;
+  toast('Font: ' + fontSize + 'px', '🔤', 1200);
+}
+fontDecBtn.addEventListener('click', () => changeFontSize(-1));
+fontIncBtn.addEventListener('click', () => changeFontSize(1));
+$('sFontDec').addEventListener('click', () => changeFontSize(-1));
+$('sFontInc').addEventListener('click', () => changeFontSize(1));
+
+// ── WORD WRAP ──
+$('wrapToggle').addEventListener('change', e => {
+  codeTA.style.whiteSpace = e.target.checked ? 'pre-wrap' : 'pre';
+});
+
+// ═══════════════════════════════════════════════════════════
+//  NEW FILE
+// ═══════════════════════════════════════════════════════════
+function openNewFile() {
+  $('newFileName').value = ''; $('newFileLang').value = 'python';
+  autoFileName(); $('modalNewFile').classList.add('open');
+}
+newFileBtn.addEventListener('click', openNewFile);
+$('newFileCancel').addEventListener('click', () => $('modalNewFile').classList.remove('open'));
+$('newFileLang').addEventListener('change', autoFileName);
+function autoFileName() {
+  const m = LANG_META[$('newFileLang').value];
+  $('newFileName').value = 'main.' + m.ext;
+}
+$('newFileCreate').addEventListener('click', () => {
+  const lang = $('newFileLang').value;
+  const name = $('newFileName').value.trim() || 'main.' + LANG_META[lang].ext;
+  saveActiveCode();
+  const f = {id:nextId++, lang, name, code:STARTERS[lang]||'', customInput:'', breakpoints:new Set(),
+             testCases:(DEFAULT_TESTS[lang]||[]).map((t,i)=>({...t,id:i+1,output:'',status:'ready'}))};
+  files.push(f); activeId = f.id;
+  $('modalNewFile').classList.remove('open');
+  renderTabs(); renderEditor(); renderDesc(); renderReadyTable(); renderEvaluatePane();
+  toast('Created ' + name, '📄', 1500);
+});
+
+// ═══════════════════════════════════════════════════════════
+//  DESC PANEL
+// ═══════════════════════════════════════════════════════════
+function renderDesc() {
+  const f = activeFile();
+  const tcCount = (f.testCases||[]).length;
+  descBody.innerHTML = `
+    <div class="desc-task">
+      <strong>${esc(f.name)}</strong>
+      ${LANG_META[f.lang].preview
+        ? 'HTML preview file. Edit and click Run to refresh.'
+        : `Write <strong>${LANG_META[f.lang].label}</strong> code. Run it directly or evaluate against test cases.`}
+    </div>
+    ${!LANG_META[f.lang].preview ? `
+    <div class="custom-stdin" style="margin-top:12px;">
+      <label>Standard Input (for Run)</label>
+      <textarea id="customStdin" placeholder="Enter stdin input for ▶ Run…">${esc(f.customInput||'')}</textarea>
+    </div>
+    <div style="margin-top:10px;font-size:11.5px;color:var(--muted);">
+      <svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor" style="vertical-align:-2px;margin-right:3px;"><path d="M12.354 4.354a.5.5 0 0 0-.708-.708L5 10.293 1.854 7.146a.5.5 0 1 0-.708.708l3.5 3.5a.5.5 0 0 0 .708 0z"/></svg>
+      <strong style="color:var(--text);">${tcCount} test case${tcCount!==1?'s':''}</strong> — click <strong>Evaluate</strong> to run all
+    </div>` : ''}
+    ${f.testCases && f.testCases.length > 0 ? f.testCases.map((t,i) => `
+      <div class="tc-row" style="margin-top:6px;">
+        <span class="tc-row-label">${esc(t.name||'Test '+(i+1))}</span>
+        Input: <code>${esc(t.input)}</code><br>
+        Expected: <code>${esc(t.expected)}</code>
+      </div>`).join('') : ''}`;
+  const el = $('customStdin');
+  if (el) el.addEventListener('input', e => { activeFile().customInput = e.target.value; });
+}
+
+// ═══════════════════════════════════════════════════════════
+//  COMPILE OUTPUT TABLE
+// ═══════════════════════════════════════════════════════════
+function renderReadyTable() {
+  const f = activeFile();
+  compileFile.textContent = 'Output: ' + f.name;
+  compileStatus.textContent = '';
+  compileContent.innerHTML = `<div class="terminal-out" style="color:var(--muted);">Click ▶ Run (Ctrl+Enter) to execute, or Evaluate to test all cases.</div>`;
+}
+function makeTable(rows) {
+  const ths = ['Test Case','Input','Expected','Output','Result'].map(h=>`<th>${h}</th>`).join('');
+  const trs = rows.map(r => {
+    let pill;
+    if (r.status==='pass')  pill=`<span class="pill pill-pass">&#x2713; PASS</span>`;
+    else if (r.status==='fail') pill=`<span class="pill pill-fail">&#x2717; FAIL</span>`;
+    else if (r.status==='run')  pill=`<span class="pill pill-run">&#x23F3; RUNNING</span>`;
+    else pill=`<span class="pill pill-ready">READY</span>`;
+    const oc = r.status==='pass'?'color:var(--pass)':r.status==='fail'?'color:var(--fail)':'color:var(--muted)';
+    return `<tr>
+      <td>${esc(r.name)}</td>
+      <td>${esc(r.input)}</td>
+      <td>${esc(r.expected)}</td>
+      <td style="${oc}">${esc(r.output)}</td>
+      <td>${pill}</td>
+    </tr>`;
+  }).join('');
+  return `<table class="rtable"><thead><tr>${ths}</tr></thead><tbody>${trs}</tbody></table>`;
+}
+
+// ═══════════════════════════════════════════════════════════
+//  REAL COMPILER BACKEND — LOCAL PYTHON SERVER
+//  Backend: python3 vpl_backend.py  (runs on port 5000)
+//  Change VPL_BACKEND_URL if your server runs elsewhere.
+// ═══════════════════════════════════════════════════════════
+const VPL_BACKEND_URL = 'http://localhost:5000';
+
+async function pistonRun(lang, code, filename, stdin) {
+  const m = LANG_META[lang]; const rt = m.piston;
+  if (!rt) throw new Error('No compiler for this language.');
+
+  // Fetch available runtimes from local backend (cached)
+  if (!pistonVer[rt]) {
+    let rts;
+    try {
+      const r = await fetch(VPL_BACKEND_URL + '/api/v2/piston/runtimes');
+      if (!r.ok) throw new Error('Backend unreachable (HTTP ' + r.status + ')');
+      rts = await r.json();
+    } catch(e) {
+      throw new Error(
+        '⚠️ Cannot reach local backend.\n' +
+        'Start the server:  python3 vpl_backend.py\n\n' + e.message
+      );
+    }
+    for (const r of rts) pistonVer[r.language] = r.version;
+    if (!pistonVer['c++'] && pistonVer['c']) pistonVer['c++'] = pistonVer['c'];
+  }
+
+  const ver = pistonVer[rt];
+  if (!ver) throw new Error(`Runtime "${rt}" not available.\nInstall it or start vpl_backend.py`);
+
+  let resp;
+  try {
+    resp = await fetch(VPL_BACKEND_URL + '/api/v2/piston/execute', {
+      method:'POST', headers:{'Content-Type':'application/json'},
+      body: JSON.stringify({language:rt, version:ver,
+        files:[{name:filename, content:code}], stdin,
+        compile_timeout:15000, run_timeout:10000})
+    });
+  } catch(e) {
+    throw new Error('⚠️ Backend offline. Run:  python3 vpl_backend.py\n\n' + e.message);
+  }
+
+  if (!resp.ok) throw new Error('Backend error (HTTP ' + resp.status + ')');
+  const data = await resp.json();
+  const ce = data.compile||{};
+  const run = data.run||{};
+
+  // If compile error, throw it
+  if (ce.stderr && ce.stderr.trim()) {
+    const err = ce.stderr.trim();
+    throw {type:'compile', message: err};
+  }
+  // If runtime error (non-zero exit + stderr)
+  if (run.code !== 0 && run.stderr && run.stderr.trim()) {
+    throw {type:'runtime', message: run.stderr.trim(), stdout: run.stdout||''};
+  }
+  return {stdout: run.stdout||'', stderr: run.stderr||'', code: run.code||0};
+}
+
+// ───────────────────────────────────────────────────────────
+//  TERMINAL helpers
+// ───────────────────────────────────────────────────────────
+function termWrite(text, cls='stdout') {
+  const el = $('termOutput');
+  const span = document.createElement('span');
+  span.className = 'term-line ' + cls;
+  span.textContent = text;
+  el.appendChild(span);
+  el.appendChild(document.createTextNode('\n'));
+  el.scrollTop = el.scrollHeight;
+}
+function termClear() {
+  $('termOutput').innerHTML = '';
+}
+function termDivider() {
+  termWrite('─'.repeat(60), 'divider');
+}
+function termSetStatus(txt, color='#56d364') {
+  const s = $('termStatus');
+  s.textContent = txt;
+  s.style.color = color;
+}
+
+// Terminal clear / copy buttons
+$('termClearBtn').addEventListener('click', () => { termClear(); termSetStatus(''); });
+$('termCopyBtn').addEventListener('click', () => {
+  const text = $('termOutput').innerText;
+  navigator.clipboard.writeText(text).then(() => toast('Output copied!','📋',1500));
+});
+$('termSendBtn').addEventListener('click', () => {
+  const v = $('termStdin').value;
+  const f = activeFile(); if (f) f.customInput = v;
+  toast('stdin set — click Run to execute', '⌨️', 1800);
+});
+$('termStdin').addEventListener('keydown', e => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); $('termSendBtn').click(); }
+});
+
+// ───────────────────────────────────────────────────────────
+//  RUN — executes code, sends output to Terminal tab
+// ───────────────────────────────────────────────────────────
+async function runCode() {
+  const f = activeFile(); const m = LANG_META[f.lang];
+  saveActiveCode();
+
+  if (m.preview) {
+    updatePreview(f);
+    switchPane('compile');
+    compileContent.innerHTML=`<div class="terminal-out" style="color:var(--pass);">&#x2713; HTML preview refreshed.</div>`;
+    return;
+  }
+
+  // Switch to Terminal tab for output
+  switchPane('terminal');
+
+  const stdin = $('termStdin').value || f.customInput || '';
+  const ts = new Date().toLocaleTimeString();
+
+  termDivider();
+  termWrite(`▶  ${f.name}  [${m.label}]  at ${ts}`, 'info');
+  if (stdin) termWrite(`stdin: ${stdin.substring(0,80)}${stdin.length>80?'…':''}`, 'info');
+  termSetStatus('● Running…', '#79c0ff');
+
+  runBtn.disabled=true;
+  runBtn.innerHTML='<span class="live-pulse"><span class="live-pulse-dot"></span>Running...</span>';
+  compileStatus.innerHTML='';
+
+  const t0 = performance.now();
+  try {
+    const result = await pistonRun(f.lang, f.code, f.name, stdin);
+    const ms = (performance.now()-t0).toFixed(0);
+
+    if (result.stdout && result.stdout.trim()) {
+      termWrite(result.stdout, 'stdout');
+    } else {
+      termWrite('(no output)', 'info');
+    }
+    if (result.stderr && result.stderr.trim()) {
+      termWrite('── stderr ──', 'divider');
+      termWrite(result.stderr, 'stderr');
+    }
+    termWrite(`✓ Exited with code ${result.code}  (${ms}ms)`, 'success');
+    termSetStatus(`✓ Done  ${ms}ms`, '#56d364');
+    toast('Executed!', '✓', 1400);
+
+    // Also update output pane
+    compileContent.innerHTML=`<div class="terminal-out">${esc(result.stdout||'(no output)')}</div>`;
+    compileStatus.textContent='Done'; compileStatus.style.color='var(--pass)';
+
+  } catch(e) {
+    const ms = (performance.now()-t0).toFixed(0);
+    const isCompile = e.type === 'compile';
+    const isRuntime = e.type === 'runtime';
+    const msg = e.message || String(e);
+
+    if (isRuntime && e.stdout) termWrite(e.stdout, 'stdout');
+    termWrite(isCompile ? '── Compile Error ──' : '── Runtime Error ──', 'divider');
+    termWrite(msg, 'stderr');
+    termWrite(`✗ Failed (${ms}ms)`, 'stderr');
+    termSetStatus('✗ Error', '#ff7b72');
+    toast(isCompile ? 'Compile error' : 'Runtime error', '✗');
+
+    compileContent.innerHTML=`<div class="terminal-out" style="color:var(--fail);">&#x274C; ${esc(msg)}</div>`;
+    compileStatus.textContent='Error'; compileStatus.style.color='var(--fail)';
+  }
+
+  runBtn.disabled=false;
+  runBtn.innerHTML='<svg width="12" height="12" viewBox="0 0 16 16" fill="currentColor"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg> Run';
+}
+runBtn.addEventListener('click', runCode);
+
+// ═══════════════════════════════════════════════════════════
+//  EVALUATE — runs all test cases, shows results
+// ═══════════════════════════════════════════════════════════
+let evalNextTcId = 100;
+
+function renderEvaluatePane() {
+  const f = activeFile();
+  if (!f) return;
+  $('evalFileName').textContent = f.name;
+  const body = $('evalBody');
+  const tcs = f.testCases || [];
+  if (tcs.length === 0) {
+    body.innerHTML = `<div style="color:var(--muted);font-size:12.5px;padding:16px 0;text-align:center;">
+      No test cases yet. Click <strong>+ Add Case</strong> to create one.
+    </div>`;
+    $('evalScore').textContent = '—';
+    return;
+  }
+  body.innerHTML = tcs.map((tc, i) => {
+    let pill = '';
+    if (tc.status==='pass')    pill=`<span class="pill pill-pass tc-status-pill">&#x2713; PASS</span>`;
+    else if (tc.status==='fail')  pill=`<span class="pill pill-fail tc-status-pill">&#x2717; FAIL</span>`;
+    else if (tc.status==='run')   pill=`<span class="pill pill-run tc-status-pill">&#x23F3;</span>`;
+    else                          pill=`<span class="pill pill-ready tc-status-pill">READY</span>`;
+
+    const actualCls = tc.status==='pass'?'tc-out-pass':tc.status==='fail'?'tc-out-fail':'tc-out-pending';
+    const actualVal = tc.output ? esc(tc.output) : '<em style="color:var(--muted);">Not run yet</em>';
+
+    return `<div class="tc-editor" id="tc-card-${tc.id}">
+      <div class="tc-editor-head">
+        <input class="tc-name-input" value="${esc(tc.name||'Test '+(i+1))}" data-tcid="${tc.id}" placeholder="Test name…">
+        ${pill}
+        <button class="eval-btn" style="height:24px;padding:0 10px;background:var(--card);border:1px solid var(--border);color:var(--text);" data-run-tc="${tc.id}" title="Run this test">▶</button>
+        <button class="tc-del-btn" data-del-tc="${tc.id}" title="Delete">&times;</button>
+      </div>
+      <div class="tc-fields">
+        <div class="tc-field">
+          <label>Input (stdin)</label>
+          <textarea data-tc-input="${tc.id}" placeholder="Enter stdin…">${esc(tc.input)}</textarea>
+        </div>
+        <div class="tc-field">
+          <label>Expected Output</label>
+          <textarea data-tc-expected="${tc.id}" placeholder="Expected stdout…">${esc(tc.expected)}</textarea>
+        </div>
+      </div>
+      <div class="tc-output-actual">
+        <span class="tc-out-label">Actual Output</span>
+        <span class="tc-out-val ${actualCls}" id="tc-actual-${tc.id}">${actualVal}</span>
+      </div>
+    </div>`;
+  }).join('');
+
+  // Wire up events
+  body.querySelectorAll('.tc-name-input').forEach(inp => {
+    inp.addEventListener('input', e => {
+      const tc = f.testCases.find(t=>t.id===+e.target.dataset.tcid);
+      if (tc) tc.name = e.target.value;
+    });
+  });
+  body.querySelectorAll('[data-tc-input]').forEach(ta => {
+    ta.addEventListener('input', e => {
+      const tc = f.testCases.find(t=>t.id===+e.target.dataset.tcInput);
+      if (tc) tc.input = e.target.value;
+    });
+  });
+  body.querySelectorAll('[data-tc-expected]').forEach(ta => {
+    ta.addEventListener('input', e => {
+      const tc = f.testCases.find(t=>t.id===+e.target.dataset.tcExpected);
+      if (tc) tc.expected = e.target.value;
+    });
+  });
+  body.querySelectorAll('[data-run-tc]').forEach(btn => {
+    btn.addEventListener('click', e => runSingleTestCase(+btn.dataset.runTc));
+  });
+  body.querySelectorAll('[data-del-tc]').forEach(btn => {
+    btn.addEventListener('click', e => {
+      const id = +btn.dataset.delTc;
+      f.testCases = f.testCases.filter(t=>t.id!==id);
+      renderEvaluatePane(); updateEvalScore();
+    });
+  });
+  updateEvalScore();
+}
+
+function updateEvalScore() {
+  const f = activeFile(); if (!f || !f.testCases) return;
+  const tcs = f.testCases;
+  const ran = tcs.filter(t=>t.status==='pass'||t.status==='fail');
+  const passed = tcs.filter(t=>t.status==='pass').length;
+  const scoreEl = $('evalScore');
+  if (ran.length === 0) { scoreEl.textContent='—'; scoreEl.style.color='var(--muted)'; return; }
+  scoreEl.textContent = `${passed}/${tcs.length} passed`;
+  scoreEl.style.color = passed===tcs.length?'var(--pass)':'var(--fail)';
+
+  // Update badge
+  const badge = $('evalBadge');
+  if (passed === tcs.length && ran.length > 0) {
+    badge.style.display='inline';badge.textContent=passed+'/'+tcs.length;
+  } else if (ran.length > 0) {
+    badge.style.display='inline';badge.textContent=passed+'/'+tcs.length;badge.style.background='var(--fail)';
+  }
+
+  // Progress bar
+  const summ = $('evalSummary'); summ.style.display='flex';
+  const bar = $('evalProgressBar');
+  const pct = tcs.length>0 ? (passed/tcs.length)*100 : 0;
+  bar.style.width = pct+'%';
+  bar.style.background = passed===tcs.length?'var(--pass)':'var(--fail)';
+  $('evalSummaryText').textContent = `${passed}/${tcs.length} test cases passed`;
+  $('evalSummaryText').style.color = passed===tcs.length?'var(--pass)':'var(--fail)';
+}
+
+async function runSingleTestCase(tcId) {
+  const f = activeFile(); saveActiveCode();
+  const tc = f.testCases.find(t=>t.id===tcId); if (!tc) return;
+  tc.status='run'; tc.output='…';
+  renderEvaluatePane();
+  try {
+    const result = await pistonRun(f.lang, f.code, f.name, tc.input||'');
+    const actual = (result.stdout||'').trim();
+    const expected = (tc.expected||'').trim();
+    tc.output = actual || '(no output)';
+    tc.status = actual === expected ? 'pass' : 'fail';
+  } catch(e) {
+    tc.output = e.message || String(e);
+    tc.status = 'fail';
+  }
+  renderEvaluatePane();
+}
+
+async function evaluateAll() {
+  const f = activeFile(); if (!f) return;
+  if (LANG_META[f.lang].preview) { toast('Evaluation not available for HTML preview','⚠️'); return; }
+  saveActiveCode();
+  if (!f.testCases || f.testCases.length === 0) {
+    toast('No test cases! Click + Add Case.','⚠️',2500); return;
+  }
+  switchPane('evaluate');
+
+  const allBtn = $('evalRunAllBtn');
+  allBtn.disabled=true;
+  allBtn.innerHTML='<span class="live-pulse"><span class="live-pulse-dot"></span>Running...</span>';
+  evalBtn.disabled=true;
+
+  // Reset all statuses
+  f.testCases.forEach(tc => { tc.status='ready'; tc.output=''; });
+  renderEvaluatePane();
+
+  let passed=0;
+  for (let i=0; i<f.testCases.length; i++) {
+    const tc = f.testCases[i];
+    tc.status='run'; tc.output='…';
+    renderEvaluatePane();
+    try {
+      const result = await pistonRun(f.lang, f.code, f.name, tc.input||'');
+      const actual = (result.stdout||'').trim();
+      const expected = (tc.expected||'').trim();
+      tc.output = actual||'(no output)';
+      tc.status = actual === expected ? 'pass' : 'fail';
+      if (tc.status==='pass') passed++;
+    } catch(e) {
+      tc.output = e.message || String(e);
+      tc.status = 'fail';
+    }
+    renderEvaluatePane();
+  }
+
+  allBtn.disabled=false;
+  allBtn.innerHTML='<svg width="11" height="11" viewBox="0 0 16 16" fill="currentColor"><path d="m11.596 8.697-6.363 3.692c-.54.313-1.233-.066-1.233-.697V4.308c0-.63.692-1.01 1.233-.696l6.363 3.692a.802.802 0 0 1 0 1.393z"/></svg> Run All';
+  evalBtn.disabled=false;
+
+  const total = f.testCases.length;
+  const allPass = passed===total;
+  toast(allPass?`🎉 All ${total} tests passed!`:`${passed}/${total} tests passed`, allPass?'✓':'✗', 3000);
+  compileStatus.textContent = passed+'/'+total+' passed';
+  compileStatus.style.color = allPass?'var(--pass)':'var(--fail)';
+}
+
+$('evalRunAllBtn').addEventListener('click', evaluateAll);
+evalBtn.addEventListener('click', evaluateAll);
+
+$('evalAddTcBtn').addEventListener('click', () => {
+  const f = activeFile(); if (!f) return;
+  if (!f.testCases) f.testCases = [];
+  const id = evalNextTcId++;
+  f.testCases.push({id, name:'Test '+(f.testCases.length+1), input:'', expected:'', output:'', status:'ready'});
+  renderEvaluatePane();
+  // Scroll to bottom
+  setTimeout(() => {
+    const body = $('evalBody'); body.scrollTop = body.scrollHeight;
+  }, 50);
+});
+
+
+// ═══════════════════════════════════════════════════════════
+//  DEBUGGER (simulated step-through)
+// ═══════════════════════════════════════════════════════════
+function dbgLog(msg, cls='') {
+  const c = $('dbgConsole');
+  c.innerHTML += `<span class="${cls}">${esc(msg)}</span>\n`;
+  c.scrollTop = c.scrollHeight;
+}
+function dbgSetStatus(s, cls) {
+  const el = $('dbgStatus'); el.textContent = s;
+  el.className = 'dbg-status ' + (cls||'');
+}
+function setDbgBtns(started) {
+  ['dbgStepOver','dbgStepIn','dbgStepOut','dbgContinue','dbgStop'].forEach(id => {
+    $(id).disabled = !started;
+  });
+  $('dbgStart').disabled = started;
+  debugBtn.disabled = started;
+}
+
+function buildTrace(f) {
+  const lines = f.code.split('\n');
+  const trace  = [];
+
+  if (f.lang === 'c' || f.lang === 'cpp') {
+    const inputMatch = f.customInput||'12345';
+    let num = parseInt(inputMatch)||0;
+    let sum = 0;
+    for (let ln=1; ln<=lines.length; ln++) {
+      const t = lines[ln-1].trim();
+      if (!t || t.startsWith('//') || t.startsWith('#') || t==='{' || t==='}') continue;
+      if (/scanf|cin\s*>>/.test(t)) {
+        trace.push({line:ln, vars:{num, sum, digit:'?'}, action:'Read input: num = '+num});
+      } else if (/int\s+num/.test(t)) {
+        trace.push({line:ln, vars:{num:'?', sum:0, digit:'?'}, action:'Declare variables'});
+      } else if (/while/.test(t)) {
+        let iter=0;
+        while (num > 0 && iter < 20) {
+          const digit = num % 10;
+          trace.push({line:ln,   vars:{num, sum, digit:'?'}, action:`while (${num} > 0) → true`});
+          trace.push({line:ln+1, vars:{num, sum, digit},     action:`digit = ${num} % 10 = ${digit}`});
+          sum += digit; num = Math.floor(num/10);
+          trace.push({line:ln+2, vars:{num:Math.floor(num), sum, digit}, action:`sum = ${sum-digit} + ${digit} = ${sum}`});
+          trace.push({line:ln+3, vars:{num, sum, digit}, action:`num = ${num*10+digit} / 10 = ${num}`});
+          iter++;
+        }
+        trace.push({line:ln, vars:{num, sum, digit:0}, action:`while (${num} > 0) → false`});
+        break;
+      } else if (/printf|cout/.test(t)) {
+        trace.push({line:ln, vars:{num, sum, digit:0}, action:`Output: ${sum}`});
+      }
+    }
+    trace.push({line:lines.length, vars:{num,sum,digit:0}, action:'Program complete', done:true});
+
+  } else if (f.lang === 'python') {
+    const inputMatch = f.customInput||'12345';
+    let num = parseInt(inputMatch)||0;
+    let total = 0;
+    for (let ln=1; ln<=lines.length; ln++) {
+      const t = lines[ln-1].trim();
+      if (!t) continue;
+      if (/^num\s*=/.test(t))   trace.push({line:ln, vars:{num, total:'?'}, action:'num = '+num});
+      else if (/^total\s*=/.test(t)) trace.push({line:ln, vars:{num, total:0}, action:'total = 0'});
+      else if (/^while/.test(t)) {
+        let iter=0;
+        while (num>0 && iter<20) {
+          trace.push({line:ln, vars:{num, total}, action:`while ${num} > 0 → True`});
+          const d = num%10; total+=d; num=Math.floor(num/10);
+          trace.push({line:ln+1, vars:{num:num*10+d, total:total-d}, action:`total += ${d} → ${total}`});
+          trace.push({line:ln+2, vars:{num, total}, action:`num //= 10 → ${num}`});
+          iter++;
+        }
+        trace.push({line:ln, vars:{num, total}, action:`while ${num} > 0 → False`});
+        break;
+      } else if (/^print/.test(t)) {
+        trace.push({line:ln, vars:{num, total}, action:`print(${total})`});
+      }
+    }
+    trace.push({line:lines.length, vars:{}, action:'Program complete', done:true});
+
+  } else {
+    for (let ln=1; ln<=lines.length; ln++) {
+      const t = lines[ln-1].trim();
+      if (t) trace.push({line:ln, vars:{}, action:'Line '+ln+': '+t.substring(0,40)});
+    }
+    trace.push({line:lines.length, vars:{}, action:'Program complete', done:true});
+  }
+  return trace;
+}
+
+function highlightLine(ln) {
+  gutter.querySelectorAll('.gutter-line').forEach(el => {
+    const l = +el.dataset.ln;
+    if (l === ln) {
+      el.style.background = '#fef3c7'; el.style.color = '#d97706'; el.style.fontWeight='800';
+    } else if (activeFile().breakpoints.has(l)) {
+      el.style.background = ''; el.style.color = ''; el.style.fontWeight = '';
+      el.classList.add('bp');
+    } else {
+      el.style.background=''; el.style.color=''; el.style.fontWeight='';
+      el.classList.remove('bp');
+    }
+  });
+  const lineH = fontSize * 1.7;
+  codeTA.scrollTop = Math.max(0, (ln-5)*lineH);
+  gutter.scrollTop = codeTA.scrollTop;
+}
+
+function renderDbgVars(vars, prevVars) {
+  const el = $('dbgVars');
+  if (!vars || Object.keys(vars).length===0) {
+    el.innerHTML = `<div style="color:var(--muted);font-size:11.5px;">No variables in scope</div>`; return;
+  }
+  el.innerHTML = Object.entries(vars).map(([k,v]) => {
+    const changed = prevVars && prevVars[k] !== v;
+    return `<div class="var-row">
+      <span class="var-name">${esc(String(k))}</span>
+      <span class="var-type">${typeof v==='number'?'int':typeof v}</span>
+      <span class="var-val${changed?' var-changed':''}">${esc(String(v))}</span>
+    </div>`;
+  }).join('');
+}
+
+function renderCallStack(step, f) {
+  const el = $('dbgStack');
+  el.innerHTML = `
+    <div class="stack-frame active-frame">
+      <span class="frame-arrow">&#x25B6;</span>
+      <span class="frame-name">main()</span>
+      <span class="frame-line">${f.name}:${step.line}</span>
+    </div>`;
+  $('dbgStackCount').textContent = '1 frame';
+}
+
+function renderBreakpointsList() {
+  const f = activeFile();
+  const el = $('dbgBreakpoints');
+  if (f.breakpoints.size === 0) {
+    el.innerHTML = '<div class="bp-empty">No breakpoints set</div>'; return;
+  }
+  el.innerHTML = Array.from(f.breakpoints).sort((a,b)=>a-b).map(ln => `
+    <div class="bp-item">
+      <span class="bp-dot"></span>
+      <span class="bp-loc">${esc(f.name)}:${ln}</span>
+      <span class="bp-del" data-ln="${ln}">&times;</span>
+    </div>`).join('');
+  el.querySelectorAll('.bp-del').forEach(el2 => {
+    el2.addEventListener('click', () => { toggleBreakpoint(+el2.dataset.ln); });
+  });
+}
+
+// Watch
+$('watchAddBtn').addEventListener('click', addWatch);
+$('watchInput').addEventListener('keydown', e => { if(e.key==='Enter') addWatch(); });
+function addWatch() {
+  const expr = $('watchInput').value.trim(); if (!expr) return;
+  if (!watchExprs.includes(expr)) { watchExprs.push(expr); $('watchInput').value=''; renderWatchList(null); }
+}
+function renderWatchList(vars) {
+  const el = $('watchList');
+  if (watchExprs.length === 0) { el.innerHTML=''; return; }
+  el.innerHTML = watchExprs.map(expr => {
+    const val = vars && vars[expr] !== undefined ? String(vars[expr]) : '?';
+    return `<div class="watch-row">
+      <span class="watch-expr">${esc(expr)}</span>
+      <span class="watch-val">${esc(val)}</span>
+      <span class="watch-del" data-expr="${esc(expr)}">&times;</span>
+    </div>`;
+  }).join('');
+  el.querySelectorAll('.watch-del').forEach(el2 => {
+    el2.addEventListener('click', () => {
+      watchExprs = watchExprs.filter(e => e !== el2.dataset.expr); renderWatchList(vars);
+    });
+  });
+}
+$('clearBpsBtn').addEventListener('click', () => {
+  const f = activeFile(); f.breakpoints.clear();
+  renderGutter(); renderBreakpointsList(); updateBPStatus();
+  toast('Breakpoints cleared', '🧹', 1400);
+});
+
+// ─── DEBUG SESSION ───
+function startDebug() {
+  const f = activeFile();
+  if (LANG_META[f.lang].preview) { toast('Debugger not available for preview files.', '⚠️'); return; }
+  saveActiveCode();
+  switchPane('debugger');
+  const steps = buildTrace(f);
+  dbgSession = {steps, cursor:0, prevVars:{}};
+  setDbgBtns(true);
+  dbgSetStatus('Running', 'running');
+  dbgLog('> Debug session started for ' + f.name, 'dbg-info');
+  dbgLog('> ' + steps.length + ' steps traced.', 'dbg-info');
+  if (f.breakpoints.size > 0) {
+    dbgLog('> Breakpoints: lines ' + Array.from(f.breakpoints).sort((a,b)=>a-b).join(', '), 'dbg-bp');
+    advanceToBreakpoint();
+  } else {
+    dbgLog('> No breakpoints set. Stepping from line 1.', 'dbg-warn');
+    applyStep(0);
+  }
+}
+function applyStep(idx) {
+  if (!dbgSession) return;
+  const f = activeFile(); const s = dbgSession.steps[idx];
+  if (!s) return;
+  dbgSession.cursor = idx;
+  highlightLine(s.line);
+  renderCallStack(s, f);
+  renderDbgVars(s.vars, dbgSession.prevVars);
+  renderWatchList(s.vars);
+  dbgLog('  Line ' + s.line + ': ' + s.action, s.done?'dbg-ok':'');
+  dbgSession.prevVars = {...(s.vars||{})};
+  if (s.done) { dbgSetStatus('Done', 'done'); dbgLog('> Session ended.', 'dbg-ok'); stopDebug(false); }
+  else dbgSetStatus('Paused at line '+s.line, 'paused');
+}
+function advanceToBreakpoint() {
+  const f = activeFile(); const {steps, cursor} = dbgSession;
+  for (let i=cursor+1; i<steps.length; i++) {
+    if (f.breakpoints.has(steps[i].line)) { applyStep(i); return; }
+  }
+  applyStep(steps.length-1);
+}
+function dbgStepOver() {
+  if (!dbgSession) return;
+  const next = dbgSession.cursor+1;
+  if (next < dbgSession.steps.length) applyStep(next);
+  else stopDebug(true);
+}
+function dbgStepIn()  { dbgStepOver(); }
+function dbgContinue(){ advanceToBreakpoint(); }
+function stopDebug(showMsg) {
+  setDbgBtns(false);
+  renderGutter();
+  if (showMsg) { dbgSetStatus('Stopped',''); dbgLog('> Stopped.','dbg-warn'); toast('Debug session ended','🐛',1500); }
+  dbgSession = null;
+}
+function dbgStepOutFn() { stopDebug(true); }
+
+$('dbgStart').addEventListener('click', startDebug);
+$('dbgStepOver').addEventListener('click', dbgStepOver);
+$('dbgStepIn').addEventListener('click', dbgStepIn);
+$('dbgStepOut').addEventListener('click', dbgStepOutFn);
+$('dbgContinue').addEventListener('click', dbgContinue);
+$('dbgStop').addEventListener('click', () => stopDebug(true));
+debugBtn.addEventListener('click', startDebug);
+
+// ═══════════════════════════════════════════════════════════
+//  MODAL HELPERS
+// ═══════════════════════════════════════════════════════════
+['modalNewFile','modalProfile','modalKeys'].forEach(id => {
+  $(id).addEventListener('click', e => { if(e.target===document.getElementById(id)) $(id).classList.remove('open'); });
+});
+keysBtn.addEventListener('click', () => $('modalKeys').classList.add('open'));
+$('keysClose').addEventListener('click', () => $('modalKeys').classList.remove('open'));
+settingsBtn.addEventListener('click', () => $('settingsOverlay').classList.add('open'));
+$('settingsClose').addEventListener('click', () => $('settingsOverlay').classList.remove('open'));
+$('settingsOverlay').addEventListener('click', e => { if(e.target===$('settingsOverlay')) $('settingsOverlay').classList.remove('open'); });
+
+// ═══════════════════════════════════════════════════════════
+//  DRAG: VERTICAL RESIZE (code ↔ output/debugger)
+// ═══════════════════════════════════════════════════════════
+(function(){
+  const bar = $('resizeBar');
+  let drag=false, sy=0, sh=0;
+  bar.addEventListener('mousedown', e => {
+    drag=true; sy=e.clientY; sh=$('bottomWrap').offsetHeight;
+    document.body.style.cursor='ns-resize'; document.body.style.userSelect='none';
+    bar.classList.add('dragging');
+  });
+  document.addEventListener('mousemove', e => {
+    if (!drag) return;
+    const delta = sy - e.clientY;
+    $('bottomWrap').style.maxHeight = Math.max(60, Math.min(sh+delta, window.innerHeight*.75)) + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (!drag) return;
+    drag=false; document.body.style.cursor=''; document.body.style.userSelect='';
+    bar.classList.remove('dragging');
+  });
+  // Touch support
+  bar.addEventListener('touchstart', e => {
+    drag=true; sy=e.touches[0].clientY; sh=$('bottomWrap').offsetHeight;
+    bar.classList.add('dragging');
+  }, {passive:true});
+  document.addEventListener('touchmove', e => {
+    if (!drag) return;
+    const delta = sy - e.touches[0].clientY;
+    $('bottomWrap').style.maxHeight = Math.max(60, Math.min(sh+delta, window.innerHeight*.75)) + 'px';
+  }, {passive:true});
+  document.addEventListener('touchend', () => { drag=false; bar.classList.remove('dragging'); });
+})();
+
+// ═══════════════════════════════════════════════════════════
+//  DRAG: HORIZONTAL RESIZE (desc panel ↔ editor)
+// ═══════════════════════════════════════════════════════════
+(function(){
+  const bar = $('hResizeBar');
+  const panel = $('descPanel');
+  let drag=false, sx=0, sw=0;
+  bar.addEventListener('mousedown', e => {
+    drag=true; sx=e.clientX; sw=panel.offsetWidth;
+    document.body.style.cursor='col-resize'; document.body.style.userSelect='none';
+    bar.classList.add('dragging');
+  });
+  document.addEventListener('mousemove', e => {
+    if (!drag) return;
+    const delta = e.clientX - sx;
+    const newW = Math.max(140, Math.min(sw+delta, window.innerWidth * 0.45));
+    panel.style.width = newW + 'px';
+    document.documentElement.style.setProperty('--desc-w', newW + 'px');
+  });
+  document.addEventListener('mouseup', () => {
+    if (!drag) return;
+    drag=false; document.body.style.cursor=''; document.body.style.userSelect='';
+    bar.classList.remove('dragging');
+  });
+  // Touch support
+  bar.addEventListener('touchstart', e => {
+    drag=true; sx=e.touches[0].clientX; sw=panel.offsetWidth;
+    bar.classList.add('dragging');
+  }, {passive:true});
+  document.addEventListener('touchmove', e => {
+    if (!drag) return;
+    const delta = e.touches[0].clientX - sx;
+    const newW = Math.max(140, Math.min(sw+delta, window.innerWidth * 0.45));
+    panel.style.width = newW + 'px';
+    document.documentElement.style.setProperty('--desc-w', newW + 'px');
+  }, {passive:true});
+  document.addEventListener('touchend', () => { drag=false; bar.classList.remove('dragging'); });
+})();
+
+// ═══════════════════════════════════════════════════════════
+//  DRAG: HORIZONTAL RESIZE (dbg left col ↔ right col)
+// ═══════════════════════════════════════════════════════════
+(function(){
+  const bar = $('dbgHResize');
+  const left = $('dbgColLeft');
+  let drag=false, sx=0, sw=0;
+  bar.addEventListener('mousedown', e => {
+    drag=true; sx=e.clientX; sw=left.offsetWidth;
+    document.body.style.cursor='col-resize'; document.body.style.userSelect='none';
+  });
+  document.addEventListener('mousemove', e => {
+    if (!drag) return;
+    const delta = e.clientX - sx;
+    const newW = Math.max(100, sw+delta);
+    left.style.flex = 'none';
+    left.style.width = newW + 'px';
+  });
+  document.addEventListener('mouseup', () => {
+    if (!drag) return;
+    drag=false; document.body.style.cursor=''; document.body.style.userSelect='';
+  });
+})();
+
+// ═══════════════════════════════════════════════════════════
+//  UTILS
+// ═══════════════════════════════════════════════════════════
+function esc(s) {
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ═══════════════════════════════════════════════════════════
+//  BACKEND HEALTH CHECK
+// ═══════════════════════════════════════════════════════════
+async function checkBackend() {
+  const dot   = document.getElementById('backendDot');
+  const label = document.getElementById('backendLabel');
+  const badge = document.getElementById('backendBadge');
+  dot.style.background   = '#f59e0b';
+  label.textContent      = 'Checking…';
+  try {
+    const r = await fetch(VPL_BACKEND_URL + '/health', { signal: AbortSignal.timeout(3000) });
+    if (r.ok) {
+      const d = await r.json();
+      dot.style.background   = '#22c55e';
+      label.textContent      = 'Backend ✓';
+      badge.style.borderColor = '#22c55e';
+      badge.style.color       = '#22c55e';
+      toast('Backend online — ' + (d.available_languages||[]).join(', '), '✓', 2500);
+    } else {
+      throw new Error('HTTP ' + r.status);
+    }
+  } catch(e) {
+    dot.style.background   = '#ef4444';
+    label.textContent      = 'Backend ✗';
+    badge.style.borderColor = '#ef4444';
+    badge.style.color       = '#ef4444';
+    toast('Backend offline. Run: python3 vpl_backend.py', '⚠️', 4000);
+  }
+}
+// Auto-check on load after 1 second
+setTimeout(checkBackend, 1000);
+
+// ═══════════════════════════════════════════════════════════
+//  INIT
+// ═══════════════════════════════════════════════════════════
+applyProfile();
+applyTheme(currentTheme);
+renderTabs();
+renderEditor();
+renderDesc();
+renderReadyTable();
+renderBreakpointsList();
+renderEvaluatePane();
+</script>
+</body>
+</html>

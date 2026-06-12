@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Career in Data Science Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f5efe4;--card:#fffaf2;--text:#202329;--muted:#6d7280;--border:#e1d6c7;--accent:#1f7a63;--accent-soft:#dff2eb;--ink:#13151a;--radius:18px;--shadow:0 18px 50px rgba(32,35,41,.1)}
+*{box-sizing:border-box}
+body{margin:0;font-family:"DM Sans",system-ui,sans-serif;color:var(--text);background:var(--bg);line-height:1.6}
+a{color:inherit}
+.top{position:sticky;top:0;z-index:5;background:rgba(245,239,228,.9);backdrop-filter:blur(14px);border-bottom:1px solid var(--border)}
+.top-inner{width:min(1120px,calc(100% - 32px));height:64px;margin:auto;display:flex;align-items:center;justify-content:space-between;gap:16px}
+.back{display:inline-flex;align-items:center;gap:8px;padding:9px 13px;border:1px solid var(--border);border-radius:10px;background:var(--card);text-decoration:none;font-size:13px;font-weight:800}
+.pill{padding:7px 12px;border-radius:999px;background:var(--accent-soft);color:var(--accent);font-size:12px;font-weight:800}
+.hero{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:54px 0 28px;display:grid;grid-template-columns:minmax(0,1fr) 320px;gap:28px;align-items:end}
+h1{margin:0;color:var(--ink);font-family:"DM Serif Display",serif;font-size:clamp(38px,6vw,72px);line-height:.95;font-weight:400}
+.lead{max-width:760px;margin:18px 0 0;color:var(--muted);font-size:18px}
+.summary{padding:22px;border:1px solid var(--border);border-radius:var(--radius);background:var(--card);box-shadow:var(--shadow)}
+.summary b{display:block;color:var(--ink);font-size:30px;line-height:1}
+.summary span{display:block;margin-top:6px;color:var(--muted);font-size:13px;font-weight:700}
+.wrap{width:min(1120px,calc(100% - 32px));margin:0 auto 56px}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.phase,.panel{border:1px solid var(--border);border-radius:var(--radius);background:var(--card);padding:22px}
+.phase h2,.panel h2{margin:0 0 8px;color:var(--ink);font-size:20px}
+.timeline{color:var(--accent);font-size:12px;font-weight:800;text-transform:uppercase}
+ul{margin:12px 0 0;padding-left:20px}
+li{margin:7px 0}
+.panels{display:grid;grid-template-columns:1.1fr .9fr;gap:16px;margin-top:16px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+.chip{padding:7px 10px;border:1px solid var(--border);border-radius:999px;background:#fff;color:var(--text);font-size:12px;font-weight:800}
+@media(max-width:760px){.hero,.grid,.panels{grid-template-columns:1fr}.top-inner{height:auto;padding:12px 0;align-items:flex-start;flex-direction:column}}
+</style>
+</head>
+<body>
+<nav class="top"><div class="top-inner"><a class="back" href="../Dashboard_v5.html">Back to Career Roadmaps</a><span class="pill">15-24 month plan</span></div></nav>
+<header class="hero">
+  <div><h1>Career in Data Science</h1><p class="lead">A practical roadmap for moving from Python and statistics into machine learning, deep learning, NLP, Generative AI, and deployable portfolio projects.</p></div>
+  <aside class="summary"><b>5</b><span>roadmap phases</span><b style="margin-top:16px">8+</b><span>portfolio-ready skills</span></aside>
+</header>
+<main class="wrap">
+  <section class="grid">
+    <article class="phase"><div class="timeline">Months 0-3</div><h2>Foundation</h2><ul><li>Python programming, Git, Linux basics, VS Code, and command line workflow.</li><li>Statistics, probability, linear algebra, logic building, and data storytelling basics.</li><li>SQL fundamentals with joins, grouping, subqueries, and dashboard-ready queries.</li></ul></article>
+    <article class="phase"><div class="timeline">Months 4-7</div><h2>Data Analysis</h2><ul><li>NumPy, Pandas, Matplotlib, Seaborn, and clean notebook documentation.</li><li>Data cleaning, feature preparation, missing-value handling, and exploratory analysis.</li><li>Excel, Power BI or Tableau dashboards for reporting and business intelligence.</li></ul></article>
+    <article class="phase"><div class="timeline">Months 8-12</div><h2>Machine Learning</h2><ul><li>Regression, classification, clustering, model metrics, cross-validation, and pipelines.</li><li>Scikit-Learn projects with real datasets and clear problem statements.</li><li>Portfolio project: placement predictor, sales forecast, churn model, or recommendation system.</li></ul></article>
+    <article class="phase"><div class="timeline">Months 13-18</div><h2>Advanced AI</h2><ul><li>Deep learning with TensorFlow or PyTorch, CNN basics, NLP, and transformer concepts.</li><li>Generative AI, LLM basics, prompt engineering, RAG, and responsible AI checks.</li><li>Deploy models with Streamlit, Flask, or FastAPI and write a short model report.</li></ul></article>
+    <article class="phase"><div class="timeline">Months 19-24</div><h2>MLOps & Career</h2><ul><li>Experiment tracking, model versioning, API deployment, monitoring, and cloud basics.</li><li>Build 3-5 polished projects with GitHub READMEs, screenshots, and live demos.</li><li>Prepare for Data Scientist, ML Engineer, AI Engineer, and Research Assistant roles.</li></ul></article>
+  </section>
+  <section class="panels">
+    <article class="panel"><h2>Tools & Libraries</h2><div class="chips"><span class="chip">Python</span><span class="chip">SQL</span><span class="chip">NumPy</span><span class="chip">Pandas</span><span class="chip">Matplotlib</span><span class="chip">Scikit-Learn</span><span class="chip">TensorFlow</span><span class="chip">PyTorch</span><span class="chip">Power BI</span><span class="chip">Tableau</span></div></article>
+    <article class="panel"><h2>Target Roles</h2><ul><li>Data Scientist</li><li>Machine Learning Engineer</li><li>AI Engineer</li><li>Research Scientist</li><li>Business Intelligence Analyst</li></ul></article>
+  </section>
+</main>
+</body>
+</html>

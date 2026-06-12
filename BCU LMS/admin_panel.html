@@ -1,0 +1,1558 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BCU LMS — Admin Control Panel</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════════
+   TOKENS — match Dashboard_v5 exactly
+═══════════════════════════════════════════════════ */
+:root {
+  --bg: #f4f4f4;
+  --card: #ffffff;
+  --accent: #1a1a1a;
+  --accent-fg: #ffffff;
+  --text: #111111;
+  --muted: #888888;
+  --border: #e0e0e0;
+  --input-bg: #fafafa;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 8px 40px rgba(0,0,0,0.09);
+  --shadow-hover: 0 16px 48px rgba(0,0,0,0.14);
+  --topbar-bg: rgba(255,255,255,0.96);
+  --topbar-border: #e0e0e0;
+  --nav-tab-bg: #f4f4f4;
+
+  /* Admin-specific semantic colours */
+  --danger: #e53e3e;
+  --danger-bg: #fff5f5;
+  --danger-border: #fed7d7;
+  --warn: #d97706;
+  --warn-bg: #fffbeb;
+  --warn-border: #fde68a;
+  --success: #059669;
+  --success-bg: #ecfdf5;
+  --success-border: #a7f3d0;
+  --info: #2563eb;
+  --info-bg: #eff6ff;
+  --info-border: #bfdbfe;
+}
+
+[data-theme="dark"] {
+  --bg: #111318;
+  --card: #1c1f26;
+  --accent: #7c9ef8;
+  --accent-fg: #0d0f14;
+  --text: #eef0f5;
+  --muted: #8b92a8;
+  --border: #2c3040;
+  --input-bg: #181b22;
+  --shadow: 0 8px 32px rgba(0,0,0,0.55);
+  --shadow-hover: 0 16px 48px rgba(0,0,0,0.7);
+  --topbar-bg: rgba(15,17,22,0.98);
+  --topbar-border: #22252e;
+  --nav-tab-bg: #1c1f26;
+
+  --danger: #fc8181;
+  --danger-bg: rgba(252,129,129,0.08);
+  --danger-border: rgba(252,129,129,0.25);
+  --warn: #fbbf24;
+  --warn-bg: rgba(251,191,36,0.08);
+  --warn-border: rgba(251,191,36,0.25);
+  --success: #34d399;
+  --success-bg: rgba(52,211,153,0.08);
+  --success-border: rgba(52,211,153,0.25);
+  --info: #60a5fa;
+  --info-bg: rgba(96,165,250,0.08);
+  --info-border: rgba(96,165,250,0.25);
+}
+
+[data-theme="dark"] .topbar { background: var(--topbar-bg); border-color: var(--topbar-border); }
+[data-theme="dark"] .sidebar { background: #141720; border-color: #22252e; }
+[data-theme="dark"] .side-item:hover { background: rgba(255,255,255,0.04); }
+[data-theme="dark"] .side-item.active { background: rgba(124,158,248,0.12); color: var(--accent); }
+[data-theme="dark"] .side-item.active .side-icon { color: var(--accent); }
+[data-theme="dark"] .stat-card { background: var(--card); border-color: var(--border); }
+[data-theme="dark"] .data-table th { background: #181b22; }
+[data-theme="dark"] .data-table tr:hover td { background: rgba(255,255,255,0.025); }
+[data-theme="dark"] .tag { background: #181b22; border-color: var(--border); }
+[data-theme="dark"] .modal-overlay .modal-box { background: var(--card); border-color: var(--border); }
+[data-theme="dark"] .search-input { background: #181b22; border-color: var(--border); color: var(--text); }
+[data-theme="dark"] .search-input:focus { border-color: var(--accent); }
+[data-theme="dark"] .nav-tab { color: var(--muted); border-color: var(--border); background: var(--nav-tab-bg); }
+[data-theme="dark"] .nav-tab:hover, [data-theme="dark"] .nav-tab.active { background: var(--accent); color: #0d0f14; border-color: var(--accent); }
+[data-theme="dark"] .access-badge.active { background: rgba(52,211,153,0.15); color: var(--success); border-color: var(--success-border); }
+[data-theme="dark"] .access-badge.suspended { background: rgba(252,129,129,0.15); color: var(--danger); border-color: var(--danger-border); }
+[data-theme="dark"] .access-badge.restricted { background: rgba(251,191,36,0.15); color: var(--warn); border-color: var(--warn-border); }
+[data-theme="dark"] .dash-input, [data-theme="dark"] .dash-select { background: #181b22; border-color: var(--border); color: var(--text); }
+[data-theme="dark"] .bulk-bar { background: #1c1f26; border-color: var(--border); }
+[data-theme="dark"] .log-item { background: #181b22; border-color: var(--border); }
+[data-theme="dark"] .activity-row:nth-child(odd) { background: rgba(255,255,255,0.015); }
+
+/* ═══════════════════════════════════════════════════
+   BASE
+═══════════════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html, body {
+  height: 100%;
+  font-family: 'DM Sans', sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* ═══════════════════════════════════════════════════
+   TOPBAR
+═══════════════════════════════════════════════════ */
+.topbar {
+  position: fixed; top: 0; left: 0; right: 0;
+  height: 60px;
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 2rem;
+  background: var(--topbar-bg);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--topbar-border);
+  z-index: 300;
+}
+
+.brand { display: flex; align-items: center; gap: 10px; text-decoration: none; }
+.brand-mark {
+  width: 38px; height: 38px;
+  background: var(--accent);
+  border-radius: 9px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; font-weight: 800; color: var(--accent-fg);
+  letter-spacing: 0.5px; flex-shrink: 0;
+}
+.brand-name { font-size: 14px; font-weight: 600; color: var(--text); }
+.brand-badge {
+  font-size: 10px; font-weight: 700; letter-spacing: 1px;
+  text-transform: uppercase; padding: 2px 8px;
+  background: var(--danger-bg); color: var(--danger);
+  border: 1px solid var(--danger-border);
+  border-radius: 20px; margin-left: 4px;
+}
+
+.topbar-right { display: flex; align-items: center; gap: 12px; }
+
+.theme-btn {
+  width: 36px; height: 36px;
+  border: 1px solid var(--border);
+  background: none; border-radius: 9px;
+  cursor: pointer; color: var(--muted);
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.2s;
+}
+.theme-btn:hover { background: var(--card); color: var(--text); }
+
+.admin-avatar {
+  width: 34px; height: 34px;
+  background: var(--accent); color: var(--accent-fg);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.5px;
+  cursor: pointer;
+}
+
+.topbar-nav { display: flex; gap: 6px; }
+.nav-tab {
+  padding: 7px 14px;
+  font-size: 12.5px; font-weight: 600;
+  letter-spacing: 0.3px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: var(--nav-tab-bg);
+  color: var(--text);
+  cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  text-decoration: none;
+  transition: all 0.18s;
+}
+.nav-tab:hover, .nav-tab.active { background: var(--accent); color: var(--accent-fg); border-color: var(--accent); }
+
+/* ═══════════════════════════════════════════════════
+   LAYOUT — sidebar + main
+═══════════════════════════════════════════════════ */
+.layout {
+  display: flex;
+  padding-top: 60px;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 230px;
+  flex-shrink: 0;
+  position: fixed; top: 60px; left: 0; bottom: 0;
+  background: var(--card);
+  border-right: 1px solid var(--border);
+  overflow-y: auto;
+  z-index: 200;
+  padding: 1.2rem 0.75rem;
+}
+
+.side-section-label {
+  font-size: 9.5px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; color: var(--muted);
+  padding: 0 0.6rem; margin: 1.2rem 0 0.4rem;
+}
+.side-section-label:first-child { margin-top: 0; }
+
+.side-item {
+  display: flex; align-items: center; gap: 10px;
+  padding: 9px 12px;
+  border-radius: 9px;
+  cursor: pointer;
+  font-size: 13px; font-weight: 500; color: var(--text);
+  transition: all 0.15s;
+  margin-bottom: 2px;
+  position: relative;
+}
+.side-item:hover { background: rgba(0,0,0,0.04); }
+.side-item.active { background: rgba(26,26,26,0.06); color: var(--accent); font-weight: 600; }
+[data-theme="dark"] .side-item.active { background: rgba(124,158,248,0.12); }
+.side-icon { width: 16px; height: 16px; flex-shrink: 0; color: var(--muted); }
+.side-item.active .side-icon { color: var(--accent); }
+.side-badge {
+  margin-left: auto;
+  background: var(--danger);
+  color: #fff;
+  font-size: 10px; font-weight: 700;
+  padding: 1px 6px; border-radius: 10px;
+  min-width: 18px; text-align: center;
+}
+.side-badge.warn { background: var(--warn); }
+.side-badge.info { background: var(--info); }
+
+.main {
+  margin-left: 230px;
+  flex: 1;
+  padding: 2rem 2.2rem;
+  min-height: calc(100vh - 60px);
+}
+
+/* ═══════════════════════════════════════════════════
+   PAGE HEADER
+═══════════════════════════════════════════════════ */
+.page-header {
+  display: flex; align-items: flex-start; justify-content: space-between;
+  margin-bottom: 1.8rem; gap: 1rem;
+}
+.page-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(24px, 3vw, 34px);
+  color: var(--text); line-height: 1.1; margin-bottom: 0.25rem;
+}
+.page-title em { font-style: italic; color: var(--muted); }
+.page-sub { font-size: 13px; color: var(--muted); }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 7px;
+  padding: 9px 18px;
+  font-size: 13px; font-weight: 600; letter-spacing: 0.3px;
+  border-radius: var(--radius-sm);
+  border: none; cursor: pointer;
+  font-family: 'DM Sans', sans-serif;
+  transition: all 0.18s;
+}
+.btn-primary { background: var(--accent); color: var(--accent-fg); box-shadow: 0 2px 10px rgba(0,0,0,0.18); }
+.btn-primary:hover { opacity: 0.88; transform: translateY(-1px); }
+.btn-ghost { background: var(--card); color: var(--text); border: 1px solid var(--border); }
+.btn-ghost:hover { border-color: #aaa; }
+.btn-danger { background: var(--danger); color: #fff; }
+.btn-danger:hover { opacity: 0.88; }
+.btn-success { background: var(--success); color: #fff; }
+.btn-warn { background: var(--warn); color: #fff; }
+.btn-sm { padding: 6px 12px; font-size: 12px; }
+.btn-xs { padding: 4px 9px; font-size: 11px; font-weight: 600; border-radius: 7px; }
+
+/* ═══════════════════════════════════════════════════
+   STAT CARDS (top row)
+═══════════════════════════════════════════════════ */
+.stats-row {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 1rem;
+  margin-bottom: 1.8rem;
+}
+.stat-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.3rem 1.4rem;
+  position: relative; overflow: hidden;
+  transition: box-shadow 0.2s;
+}
+.stat-card:hover { box-shadow: var(--shadow-hover); }
+.stat-label {
+  font-size: 10.5px; font-weight: 700; letter-spacing: 1.8px;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 0.6rem;
+}
+.stat-value {
+  font-family: 'DM Serif Display', serif;
+  font-size: 32px; color: var(--text); line-height: 1;
+  margin-bottom: 0.35rem;
+}
+.stat-meta { font-size: 12px; color: var(--muted); }
+.stat-delta {
+  display: inline-flex; align-items: center; gap: 3px;
+  font-size: 11px; font-weight: 600; padding: 2px 7px;
+  border-radius: 6px; margin-left: 6px;
+}
+.stat-delta.up { background: var(--success-bg); color: var(--success); }
+.stat-delta.down { background: var(--danger-bg); color: var(--danger); }
+.stat-accent-bar {
+  position: absolute; bottom: 0; left: 0; right: 0; height: 3px;
+  border-radius: 0 0 var(--radius) var(--radius);
+}
+
+/* ═══════════════════════════════════════════════════
+   PANEL
+═══════════════════════════════════════════════════ */
+.panel {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 1.5rem 1.6rem;
+  margin-bottom: 1.4rem;
+}
+.panel-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1.2rem; gap: 1rem;
+}
+.panel-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 18px; color: var(--text);
+  display: flex; align-items: center; gap: 9px;
+}
+.panel-tools { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+/* ═══════════════════════════════════════════════════
+   SEARCH + FILTERS
+═══════════════════════════════════════════════════ */
+.search-wrap { position: relative; }
+.search-wrap svg { position: absolute; left: 10px; top: 50%; transform: translateY(-50%); color: var(--muted); pointer-events: none; }
+.search-input {
+  height: 36px; padding: 0 12px 0 34px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--input-bg); color: var(--text);
+  font-size: 13px; font-family: 'DM Sans', sans-serif;
+  outline: none; width: 220px;
+  transition: border-color 0.18s, box-shadow 0.18s;
+}
+.search-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,0,0,0.07); }
+[data-theme="dark"] .search-input:focus { box-shadow: 0 0 0 3px rgba(124,158,248,0.12); }
+
+.dash-select {
+  height: 36px; padding: 0 30px 0 10px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--input-bg); color: var(--text);
+  font-size: 12.5px; font-family: 'DM Sans', sans-serif;
+  outline: none; cursor: pointer; appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+  background-repeat: no-repeat; background-position: right 10px center;
+}
+
+.dash-input {
+  height: 36px; padding: 0 12px;
+  border: 1px solid var(--border); border-radius: 8px;
+  background: var(--input-bg); color: var(--text);
+  font-size: 13px; font-family: 'DM Sans', sans-serif;
+  outline: none; width: 100%;
+  transition: border-color 0.18s;
+}
+.dash-input:focus { border-color: var(--accent); }
+
+/* ═══════════════════════════════════════════════════
+   DATA TABLE
+═══════════════════════════════════════════════════ */
+.table-wrap { overflow-x: auto; border-radius: var(--radius-sm); }
+.data-table {
+  width: 100%; border-collapse: collapse;
+  font-size: 13px;
+}
+.data-table th {
+  background: var(--bg);
+  padding: 10px 14px;
+  font-size: 10.5px; font-weight: 700; letter-spacing: 1.5px;
+  text-transform: uppercase; color: var(--muted);
+  text-align: left; white-space: nowrap;
+  border-bottom: 1px solid var(--border);
+}
+.data-table td {
+  padding: 11px 14px;
+  border-bottom: 1px solid var(--border);
+  vertical-align: middle;
+  color: var(--text);
+}
+.data-table tr:last-child td { border-bottom: none; }
+.data-table tr:hover td { background: rgba(0,0,0,0.015); cursor: default; }
+.data-table .check-col { width: 36px; }
+.data-table input[type="checkbox"] { accent-color: var(--accent); width: 14px; height: 14px; cursor: pointer; }
+
+.student-meta { display: flex; align-items: center; gap: 10px; }
+.student-avatar {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--accent); color: var(--accent-fg);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700; flex-shrink: 0;
+}
+.student-name { font-weight: 600; font-size: 13px; color: var(--text); }
+.student-id { font-size: 11px; color: var(--muted); }
+
+/* ═══════════════════════════════════════════════════
+   BADGES / TAGS
+═══════════════════════════════════════════════════ */
+.access-badge {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 3px 9px; border-radius: 20px;
+  font-size: 11px; font-weight: 700; letter-spacing: 0.3px;
+  border: 1px solid;
+  white-space: nowrap;
+}
+.access-badge.active { background: var(--success-bg); color: var(--success); border-color: var(--success-border); }
+.access-badge.suspended { background: var(--danger-bg); color: var(--danger); border-color: var(--danger-border); }
+.access-badge.restricted { background: var(--warn-bg); color: var(--warn); border-color: var(--warn-border); }
+.access-badge.pending { background: var(--info-bg); color: var(--info); border-color: var(--info-border); }
+.access-badge::before { content: ''; width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+
+.tag {
+  display: inline-flex; align-items: center; gap: 4px;
+  padding: 2px 8px; border-radius: 6px;
+  background: var(--bg); border: 1px solid var(--border);
+  font-size: 11px; color: var(--muted); font-weight: 500;
+}
+
+/* ═══════════════════════════════════════════════════
+   BULK ACTION BAR
+═══════════════════════════════════════════════════ */
+.bulk-bar {
+  display: none;
+  align-items: center; gap: 10px;
+  padding: 10px 14px;
+  background: var(--card);
+  border: 1px solid var(--accent);
+  border-radius: var(--radius-sm);
+  margin-bottom: 1rem;
+  animation: fadeUp 0.25s ease both;
+}
+.bulk-bar.visible { display: flex; }
+.bulk-count { font-size: 13px; font-weight: 600; color: var(--accent); flex: 1; }
+
+/* ═══════════════════════════════════════════════════
+   SECTIONS (tab content)
+═══════════════════════════════════════════════════ */
+.section { display: none; }
+.section.active { display: block; }
+
+/* ═══════════════════════════════════════════════════
+   ACTIVITY LOG
+═══════════════════════════════════════════════════ */
+.log-list { display: flex; flex-direction: column; gap: 6px; }
+.log-item {
+  display: flex; align-items: flex-start; gap: 12px;
+  padding: 10px 12px; border-radius: 9px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  font-size: 12.5px;
+}
+.log-icon {
+  width: 28px; height: 28px; border-radius: 7px;
+  display: flex; align-items: center; justify-content: center;
+  flex-shrink: 0; font-size: 12px;
+}
+.log-icon.danger { background: var(--danger-bg); color: var(--danger); }
+.log-icon.success { background: var(--success-bg); color: var(--success); }
+.log-icon.warn { background: var(--warn-bg); color: var(--warn); }
+.log-icon.info { background: var(--info-bg); color: var(--info); }
+.log-body { flex: 1; }
+.log-msg { color: var(--text); margin-bottom: 2px; }
+.log-msg strong { font-weight: 600; }
+.log-time { font-size: 11px; color: var(--muted); }
+
+/* ═══════════════════════════════════════════════════
+   GRID LAYOUTS
+═══════════════════════════════════════════════════ */
+.two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 1.2rem; }
+.three-col { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem; }
+
+/* Mini stat inside panel */
+.mini-stat {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 0;
+  border-bottom: 1px solid var(--border);
+  font-size: 13px;
+}
+.mini-stat:last-child { border-bottom: none; padding-bottom: 0; }
+.mini-stat-val { font-weight: 700; color: var(--text); }
+
+/* ═══════════════════════════════════════════════════
+   COURSE ACCESS MATRIX
+═══════════════════════════════════════════════════ */
+.course-row {
+  display: flex; align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+  gap: 12px;
+}
+.course-row:last-child { border-bottom: none; }
+.course-icon {
+  width: 34px; height: 34px; border-radius: 8px;
+  background: var(--bg); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 14px; flex-shrink: 0;
+}
+.course-info { flex: 1; }
+.course-name { font-size: 13px; font-weight: 600; color: var(--text); }
+.course-meta { font-size: 11px; color: var(--muted); }
+.toggle-switch {
+  position: relative; display: inline-block;
+  width: 38px; height: 21px; flex-shrink: 0;
+}
+.toggle-switch input { opacity: 0; width: 0; height: 0; }
+.toggle-knob {
+  position: absolute; cursor: pointer; inset: 0;
+  background: var(--border); border-radius: 21px;
+  transition: 0.25s;
+}
+.toggle-knob::before {
+  content: ''; position: absolute;
+  height: 15px; width: 15px; left: 3px; bottom: 3px;
+  background: white; border-radius: 50%;
+  transition: 0.25s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle-switch input:checked + .toggle-knob { background: var(--success); }
+.toggle-switch input:checked + .toggle-knob::before { transform: translateX(17px); }
+
+/* ═══════════════════════════════════════════════════
+   MODAL
+═══════════════════════════════════════════════════ */
+.modal-overlay {
+  display: none;
+  position: fixed; inset: 0; z-index: 500;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+.modal-overlay.open { display: flex; }
+.modal-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 2rem;
+  width: 100%; max-width: 500px;
+  box-shadow: 0 24px 80px rgba(0,0,0,0.25);
+  animation: fadeUp 0.3s cubic-bezier(0.22,1,0.36,1) both;
+  max-height: 90vh; overflow-y: auto;
+}
+.modal-title {
+  font-family: 'DM Serif Display', serif;
+  font-size: 20px; margin-bottom: 1.4rem; color: var(--text);
+}
+.modal-field { margin-bottom: 1rem; }
+.modal-label { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: var(--muted); display: block; margin-bottom: 6px; }
+.modal-actions { display: flex; gap: 10px; justify-content: flex-end; margin-top: 1.6rem; }
+
+/* ═══════════════════════════════════════════════════
+   ALERT BANNER
+═══════════════════════════════════════════════════ */
+.alert {
+  display: flex; align-items: center; gap: 10px;
+  padding: 10px 14px; border-radius: var(--radius-sm);
+  font-size: 12.5px; font-weight: 500; margin-bottom: 1.2rem;
+  border: 1px solid;
+}
+.alert svg { flex-shrink: 0; }
+.alert.warn { background: var(--warn-bg); border-color: var(--warn-border); color: var(--warn); }
+.alert.danger { background: var(--danger-bg); border-color: var(--danger-border); color: var(--danger); }
+.alert.success { background: var(--success-bg); border-color: var(--success-border); color: var(--success); }
+
+/* ═══════════════════════════════════════════════════
+   PROGRESS BARS
+═══════════════════════════════════════════════════ */
+.prog-row { margin-bottom: 1rem; }
+.prog-label { display: flex; justify-content: space-between; font-size: 12px; color: var(--muted); margin-bottom: 5px; }
+.prog-label strong { color: var(--text); font-weight: 600; }
+.prog-bar { height: 6px; background: var(--border); border-radius: 10px; overflow: hidden; }
+.prog-fill { height: 100%; border-radius: 10px; transition: width 1s ease; }
+
+/* ═══════════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════════ */
+.toast-wrap {
+  position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 999;
+  display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+.toast {
+  display: flex; align-items: center; gap: 10px;
+  padding: 11px 16px; border-radius: 10px;
+  background: #1a1a1a; color: #fff;
+  font-size: 13px; font-weight: 500;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+  pointer-events: auto;
+  animation: toastIn 0.3s ease both;
+  max-width: 320px;
+}
+.toast.removing { animation: toastOut 0.3s ease both; }
+.toast.success { background: var(--success); }
+.toast.danger { background: var(--danger); }
+.toast.warn { background: var(--warn); }
+
+/* ═══════════════════════════════════════════════════
+   ANIMATIONS
+═══════════════════════════════════════════════════ */
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+@keyframes toastIn {
+  from { opacity: 0; transform: translateX(40px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+@keyframes toastOut {
+  from { opacity: 1; transform: translateX(0); }
+  to   { opacity: 0; transform: translateX(40px); }
+}
+
+/* ═══════════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════════ */
+@media (max-width: 1100px) {
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .two-col { grid-template-columns: 1fr; }
+}
+@media (max-width: 800px) {
+  .sidebar { display: none; }
+  .main { margin-left: 0; padding: 1.2rem; }
+  .stats-row { grid-template-columns: repeat(2, 1fr); }
+  .three-col { grid-template-columns: 1fr 1fr; }
+  .topbar-nav { display: none; }
+}
+@media (max-width: 500px) {
+  .stats-row { grid-template-columns: 1fr 1fr; }
+  .three-col { grid-template-columns: 1fr; }
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════════════════════════════════
+     TOPBAR
+══════════════════════════════════════════════ -->
+<header class="topbar">
+  <div style="display:flex;align-items:center;gap:1.6rem">
+    <a class="brand" href="home.html">
+      <div class="brand-mark">BCU</div>
+      <span class="brand-name">LMS</span>
+      <span class="brand-badge">Admin</span>
+    </a>
+    <nav class="topbar-nav">
+      <a class="nav-tab active" href="#" onclick="switchSection('students',this);return false;">Students</a>
+      <a class="nav-tab" href="#" onclick="switchSection('courses',this);return false;">Courses</a>
+      <a class="nav-tab" href="#" onclick="switchSection('reports',this);return false;">Reports</a>
+      <a class="nav-tab" href="#" onclick="switchSection('settings',this);return false;">Settings</a>
+    </nav>
+  </div>
+  <div class="topbar-right">
+    <button class="theme-btn" onclick="toggleTheme()" title="Toggle theme">
+      <svg id="theme-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    </button>
+    <div class="admin-avatar" title="Admin">AD</div>
+  </div>
+</header>
+
+<!-- ══════════════════════════════════════════════
+     LAYOUT
+══════════════════════════════════════════════ -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar">
+    <div class="side-section-label">Overview</div>
+    <div class="side-item active" onclick="setSideActive(this);switchSection('students')">
+      <svg class="side-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+      Student Access
+      <span class="side-badge">3</span>
+    </div>
+    <div class="side-item" onclick="setSideActive(this);switchSection('courses')">
+      <svg class="side-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
+      Course Control
+    </div>
+    <div class="side-item" onclick="setSideActive(this);switchSection('reports')">
+      <svg class="side-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+      Reports
+      <span class="side-badge info">2</span>
+    </div>
+    <div class="side-item" onclick="setSideActive(this);switchSection('settings')">
+      <svg class="side-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      System Settings
+    </div>
+
+    <div class="side-section-label">Access</div>
+    <div class="side-item" onclick="setSideActive(this);switchSection('students');filterStatus('suspended')">
+      <svg class="side-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
+      Suspended
+      <span class="side-badge">3</span>
+    </div>
+    <div class="side-item" onclick="setSideActive(this);switchSection('students');filterStatus('pending')">
+      <svg class="side-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Pending Approval
+      <span class="side-badge warn">5</span>
+    </div>
+    <div class="side-item" onclick="setSideActive(this);switchSection('students');filterStatus('restricted')">
+      <svg class="side-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+      Restricted
+    </div>
+
+    <div class="side-section-label">Tools</div>
+    <div class="side-item" onclick="openModal('add-student-modal')">
+      <svg class="side-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M16 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/></svg>
+      Add Student
+    </div>
+    <div class="side-item" onclick="showToast('Exporting student data…','info')">
+      <svg class="side-icon" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+      Export CSV
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="main">
+
+    <!-- ════════════════════════════════
+         SECTION: STUDENTS
+    ════════════════════════════════ -->
+    <div id="sec-students" class="section active">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Student <em>Access</em> Control</div>
+          <div class="page-sub">Manage enrolment, access levels, and account status for all students</div>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <button class="btn btn-ghost btn-sm" onclick="showToast('Exporting…','info')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+            Export
+          </button>
+          <button class="btn btn-primary btn-sm" onclick="openModal('add-student-modal')">
+            <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+            Add Student
+          </button>
+        </div>
+      </div>
+
+      <!-- Stat Cards -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-label">Total Students</div>
+          <div class="stat-value" id="cnt-total">248</div>
+          <div class="stat-meta">Across all batches <span class="stat-delta up">↑ 12</span></div>
+          <div class="stat-accent-bar" style="background:var(--accent)"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Active</div>
+          <div class="stat-value" id="cnt-active" style="color:var(--success)">230</div>
+          <div class="stat-meta">Full LMS access granted</div>
+          <div class="stat-accent-bar" style="background:var(--success)"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Suspended</div>
+          <div class="stat-value" id="cnt-suspended" style="color:var(--danger)">3</div>
+          <div class="stat-meta">Awaiting review</div>
+          <div class="stat-accent-bar" style="background:var(--danger)"></div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label">Pending</div>
+          <div class="stat-value" id="cnt-pending" style="color:var(--warn)">5</div>
+          <div class="stat-meta">New registrations</div>
+          <div class="stat-accent-bar" style="background:var(--warn)"></div>
+        </div>
+      </div>
+
+      <!-- Alert -->
+      <div class="alert warn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="15" height="15" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <span><strong>5 students</strong> are awaiting enrolment approval. Review and approve or reject their requests below.</span>
+      </div>
+
+      <!-- Bulk Action Bar -->
+      <div class="bulk-bar" id="bulk-bar">
+        <span class="bulk-count" id="bulk-count">0 selected</span>
+        <button class="btn btn-success btn-xs" onclick="bulkAction('activate')">Activate</button>
+        <button class="btn btn-warn btn-xs" onclick="bulkAction('restrict')">Restrict</button>
+        <button class="btn btn-danger btn-xs" onclick="bulkAction('suspend')">Suspend</button>
+        <button class="btn btn-ghost btn-xs" onclick="clearSelection()">Clear</button>
+      </div>
+
+      <!-- Student Table -->
+      <div class="panel" style="padding:0">
+        <div class="panel-header" style="padding:1.3rem 1.5rem 1rem">
+          <div class="panel-title" style="font-size:15px">
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/></svg>
+            All Students
+          </div>
+          <div class="panel-tools">
+            <div class="search-wrap">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+              <input class="search-input" id="student-search" type="text" placeholder="Search students…" oninput="filterStudents()">
+            </div>
+            <select class="dash-select" id="status-filter" onchange="filterStudents()">
+              <option value="">All Status</option>
+              <option value="active">Active</option>
+              <option value="suspended">Suspended</option>
+              <option value="restricted">Restricted</option>
+              <option value="pending">Pending</option>
+            </select>
+            <select class="dash-select" id="dept-filter" onchange="filterStudents()">
+              <option value="">All Depts</option>
+              <option value="MCA">MCA</option>
+              <option value="BCA">BCA</option>
+              <option value="B.Sc CS">B.Sc CS</option>
+              <option value="MBA IT">MBA IT</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="data-table" id="student-table">
+            <thead>
+              <tr>
+                <th class="check-col"><input type="checkbox" id="select-all" onchange="toggleSelectAll(this)"></th>
+                <th>Student</th>
+                <th>USN / Dept</th>
+                <th>Semester</th>
+                <th>Access Status</th>
+                <th>VPL Lab</th>
+                <th>Last Login</th>
+                <th>Actions</th>
+              </tr>
+            </thead>
+            <tbody id="student-tbody"></tbody>
+          </table>
+        </div>
+        <div style="padding:0.9rem 1.5rem;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;color:var(--muted)" id="table-foot">Showing all students</span>
+          <div style="display:flex;gap:6px" id="pagination"></div>
+        </div>
+      </div>
+    </div><!-- /section students -->
+
+
+    <!-- ════════════════════════════════
+         SECTION: COURSES
+    ════════════════════════════════ -->
+    <div id="sec-courses" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Course <em>Access</em> Control</div>
+          <div class="page-sub">Enable or restrict access to course materials and VPL labs per programme</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="showToast('Course changes saved','success')">Save Changes</button>
+      </div>
+
+      <div class="two-col">
+        <!-- MCA Courses -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span style="font-size:18px">🎓</span> MCA — Courses
+            </div>
+            <span class="access-badge active">All Active</span>
+          </div>
+          <div id="course-list-mca"></div>
+        </div>
+
+        <!-- BCA Courses -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span style="font-size:18px">📚</span> BCA — Courses
+            </div>
+            <span class="access-badge restricted">2 Restricted</span>
+          </div>
+          <div id="course-list-bca"></div>
+        </div>
+
+        <!-- VPL Labs -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span style="font-size:18px">💻</span> VPL Lab Access
+            </div>
+          </div>
+          <div id="vpl-list"></div>
+        </div>
+
+        <!-- Career Roadmaps -->
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">
+              <span style="font-size:18px">🗺</span> Career Roadmaps
+            </div>
+          </div>
+          <div id="roadmap-list"></div>
+        </div>
+      </div>
+    </div><!-- /section courses -->
+
+
+    <!-- ════════════════════════════════
+         SECTION: REPORTS
+    ════════════════════════════════ -->
+    <div id="sec-reports" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">Analytics & <em>Reports</em></div>
+          <div class="page-sub">LMS usage, login activity, and access audit trail</div>
+        </div>
+        <button class="btn btn-ghost btn-sm" onclick="showToast('Generating PDF report…','info')">
+          <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+          PDF Report
+        </button>
+      </div>
+
+      <div class="three-col" style="margin-bottom:1.4rem">
+        <div class="panel">
+          <div class="stat-label">Today's Logins</div>
+          <div class="stat-value" style="font-size:28px;margin:6px 0 4px">47</div>
+          <div class="stat-meta">Peak: 2–4 PM</div>
+        </div>
+        <div class="panel">
+          <div class="stat-label">VPL Executions</div>
+          <div class="stat-value" style="font-size:28px;margin:6px 0 4px;color:var(--info)">312</div>
+          <div class="stat-meta">This week</div>
+        </div>
+        <div class="panel">
+          <div class="stat-label">Avg Session</div>
+          <div class="stat-value" style="font-size:28px;margin:6px 0 4px;color:var(--success)">38m</div>
+          <div class="stat-meta">Per student</div>
+        </div>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-title" style="margin-bottom:1.2rem">Module Engagement</div>
+          <div id="engagement-bars"></div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-header">
+            <div class="panel-title">Access Audit Log</div>
+            <button class="btn btn-ghost btn-xs" onclick="showToast('Cleared audit log view','info')">Clear view</button>
+          </div>
+          <div class="log-list" id="audit-log"></div>
+        </div>
+      </div>
+    </div><!-- /section reports -->
+
+
+    <!-- ════════════════════════════════
+         SECTION: SETTINGS
+    ════════════════════════════════ -->
+    <div id="sec-settings" class="section">
+      <div class="page-header">
+        <div>
+          <div class="page-title">System <em>Settings</em></div>
+          <div class="page-sub">Configure LMS-wide access rules, session limits, and defaults</div>
+        </div>
+        <button class="btn btn-primary btn-sm" onclick="showToast('Settings saved','success')">Save Settings</button>
+      </div>
+
+      <div class="two-col">
+        <div class="panel">
+          <div class="panel-title" style="margin-bottom:1.4rem">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Access Defaults
+          </div>
+
+          <div class="mini-stat">
+            <span class="stat-label" style="font-size:12.5px;letter-spacing:0;text-transform:none;color:var(--text)">Allow new registrations</span>
+            <label class="toggle-switch"><input type="checkbox" checked onchange="showToast('Registration setting updated','success')"><span class="toggle-knob"></span></label>
+          </div>
+          <div class="mini-stat">
+            <span style="font-size:12.5px">Auto-approve students</span>
+            <label class="toggle-switch"><input type="checkbox" onchange="showToast('Auto-approve setting updated','warn')"><span class="toggle-knob"></span></label>
+          </div>
+          <div class="mini-stat">
+            <span style="font-size:12.5px">VPL Lab enabled globally</span>
+            <label class="toggle-switch"><input type="checkbox" checked onchange="showToast('VPL access updated','success')"><span class="toggle-knob"></span></label>
+          </div>
+          <div class="mini-stat">
+            <span style="font-size:12.5px">Career Roadmaps visible</span>
+            <label class="toggle-switch"><input type="checkbox" checked onchange="showToast('Roadmap setting updated','success')"><span class="toggle-knob"></span></label>
+          </div>
+          <div class="mini-stat">
+            <span style="font-size:12.5px">Force password change on first login</span>
+            <label class="toggle-switch"><input type="checkbox" checked onchange="showToast('Password policy updated','success')"><span class="toggle-knob"></span></label>
+          </div>
+          <div class="mini-stat">
+            <span style="font-size:12.5px">Enable 2-Factor Authentication</span>
+            <label class="toggle-switch"><input type="checkbox" onchange="showToast('2FA policy updated','warn')"><span class="toggle-knob"></span></label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title" style="margin-bottom:1.4rem">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            Session & Limits
+          </div>
+
+          <div class="modal-field">
+            <label class="modal-label">Session Timeout (minutes)</label>
+            <input class="dash-input" type="number" value="60" min="5" max="480">
+          </div>
+          <div class="modal-field">
+            <label class="modal-label">Max Concurrent Logins per Student</label>
+            <input class="dash-input" type="number" value="2" min="1" max="5">
+          </div>
+          <div class="modal-field">
+            <label class="modal-label">VPL Execution Timeout (seconds)</label>
+            <input class="dash-input" type="number" value="10" min="5" max="30">
+          </div>
+          <div class="modal-field">
+            <label class="modal-label">Max File Upload Size (MB)</label>
+            <input class="dash-input" type="number" value="10" min="1" max="100">
+          </div>
+          <div class="modal-field">
+            <label class="modal-label">Default Access Role for New Students</label>
+            <select class="dash-select" style="width:100%;height:36px">
+              <option>Active (Full Access)</option>
+              <option>Restricted (Read-Only)</option>
+              <option>Pending (Awaiting Approval)</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title" style="margin-bottom:1.4rem">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            Notifications
+          </div>
+          <div class="mini-stat">
+            <span style="font-size:12.5px">Email on new registration</span>
+            <label class="toggle-switch"><input type="checkbox" checked onchange="showToast('Email setting updated','success')"><span class="toggle-knob"></span></label>
+          </div>
+          <div class="mini-stat">
+            <span style="font-size:12.5px">Email on account suspension</span>
+            <label class="toggle-switch"><input type="checkbox" checked onchange="showToast('Email setting updated','success')"><span class="toggle-knob"></span></label>
+          </div>
+          <div class="mini-stat">
+            <span style="font-size:12.5px">Daily activity digest</span>
+            <label class="toggle-switch"><input type="checkbox" onchange="showToast('Digest setting updated','warn')"><span class="toggle-knob"></span></label>
+          </div>
+          <div class="mini-stat">
+            <span style="font-size:12.5px">Alert on suspicious login</span>
+            <label class="toggle-switch"><input type="checkbox" checked onchange="showToast('Security alert updated','success')"><span class="toggle-knob"></span></label>
+          </div>
+        </div>
+
+        <div class="panel">
+          <div class="panel-title" style="margin-bottom:1rem">
+            <svg xmlns="http://www.w3.org/2000/svg" width="17" height="17" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+            Maintenance
+          </div>
+          <div style="display:flex;flex-direction:column;gap:8px">
+            <button class="btn btn-ghost" style="justify-content:flex-start;gap:8px" onclick="showToast('Database backed up successfully','success')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><ellipse cx="12" cy="5" rx="9" ry="3"/><path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3"/><path d="M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"/></svg>
+              Backup Database
+            </button>
+            <button class="btn btn-ghost" style="justify-content:flex-start;gap:8px" onclick="showToast('Session cache cleared','success')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+              Clear Session Cache
+            </button>
+            <button class="btn btn-ghost" style="justify-content:flex-start;gap:8px" onclick="showToast('Audit logs exported','info')">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              Export Audit Logs
+            </button>
+            <button class="btn btn-danger" style="justify-content:flex-start;gap:8px" onclick="confirmDanger()">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+              Reset All Sessions
+            </button>
+          </div>
+        </div>
+      </div>
+    </div><!-- /section settings -->
+
+  </main>
+</div><!-- /layout -->
+
+
+<!-- ══════════════════════════════════════════════
+     MODALS
+══════════════════════════════════════════════ -->
+
+<!-- Add Student -->
+<div class="modal-overlay" id="add-student-modal" onclick="modalBgClose(event,this)">
+  <div class="modal-box">
+    <div class="modal-title">Add New Student</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-field">
+        <label class="modal-label">First Name</label>
+        <input class="dash-input" type="text" placeholder="Priya">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Last Name</label>
+        <input class="dash-input" type="text" placeholder="Sharma">
+      </div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Email Address</label>
+      <input class="dash-input" type="email" placeholder="priya.sharma@bcu.edu.in">
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-field">
+        <label class="modal-label">USN</label>
+        <input class="dash-input" type="text" placeholder="1BG23MCA001">
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Programme</label>
+        <select class="dash-select" style="width:100%;height:36px">
+          <option>MCA</option>
+          <option>BCA</option>
+          <option>B.Sc CS</option>
+          <option>MBA IT</option>
+        </select>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="modal-field">
+        <label class="modal-label">Semester</label>
+        <select class="dash-select" style="width:100%;height:36px">
+          <option>1</option><option>2</option><option>3</option>
+          <option>4</option><option>5</option><option>6</option>
+        </select>
+      </div>
+      <div class="modal-field">
+        <label class="modal-label">Access Level</label>
+        <select class="dash-select" style="width:100%;height:36px">
+          <option value="active">Active</option>
+          <option value="pending">Pending</option>
+          <option value="restricted">Restricted</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('add-student-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="addStudentFromModal()">Add Student</button>
+    </div>
+  </div>
+</div>
+
+<!-- Student Detail / Edit -->
+<div class="modal-overlay" id="student-detail-modal" onclick="modalBgClose(event,this)">
+  <div class="modal-box">
+    <div class="modal-title" id="detail-title">Student Details</div>
+    <div id="detail-body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('student-detail-modal')">Close</button>
+      <button class="btn btn-danger btn-sm" id="detail-suspend-btn" onclick="actionFromDetail('suspended')">Suspend</button>
+      <button class="btn btn-success btn-sm" id="detail-activate-btn" onclick="actionFromDetail('active')">Activate</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Danger -->
+<div class="modal-overlay" id="danger-modal" onclick="modalBgClose(event,this)">
+  <div class="modal-box" style="max-width:400px">
+    <div class="modal-title" style="color:var(--danger)">⚠ Reset All Sessions?</div>
+    <p style="font-size:13px;color:var(--muted);line-height:1.6;margin-bottom:1rem">This will immediately log out all active students and admins. This action cannot be undone.</p>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('danger-modal')">Cancel</button>
+      <button class="btn btn-danger" onclick="closeModal('danger-modal');showToast('All sessions reset','danger')">Reset Now</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast container -->
+<div class="toast-wrap" id="toast-wrap"></div>
+
+
+<script>
+/* ═══════════════════════════════════════════════
+   DATA
+═══════════════════════════════════════════════ */
+const STUDENTS = [
+  {id:1,name:"Aarav Mehta",usn:"1BG23MCA001",dept:"MCA",sem:2,email:"aarav.m@bcu.edu.in",status:"active",vpl:true,lastLogin:"Today, 09:42"},
+  {id:2,name:"Priya Sharma",usn:"1BG23MCA002",dept:"MCA",sem:2,email:"priya.s@bcu.edu.in",status:"active",vpl:true,lastLogin:"Today, 08:15"},
+  {id:3,name:"Rohit Kumar",usn:"1BG23BCA010",dept:"BCA",sem:4,email:"rohit.k@bcu.edu.in",status:"suspended",vpl:false,lastLogin:"3 days ago"},
+  {id:4,name:"Sneha Patel",usn:"1BG23MCA005",dept:"MCA",sem:2,email:"sneha.p@bcu.edu.in",status:"restricted",vpl:false,lastLogin:"Yesterday, 14:30"},
+  {id:5,name:"Karan Singh",usn:"1BG23BCA012",dept:"BCA",sem:3,email:"karan.s@bcu.edu.in",status:"pending",vpl:false,lastLogin:"Never"},
+  {id:6,name:"Divya Nair",usn:"1BG23MCA007",dept:"MCA",sem:1,email:"divya.n@bcu.edu.in",status:"active",vpl:true,lastLogin:"Today, 11:05"},
+  {id:7,name:"Vikram Rao",usn:"1BG23BSC001",dept:"B.Sc CS",sem:5,email:"vikram.r@bcu.edu.in",status:"active",vpl:true,lastLogin:"Today, 07:50"},
+  {id:8,name:"Ananya Desai",usn:"1BG23BCA015",dept:"BCA",sem:2,email:"ananya.d@bcu.edu.in",status:"pending",vpl:false,lastLogin:"Never"},
+  {id:9,name:"Suresh Babu",usn:"1BG23MBA001",dept:"MBA IT",sem:1,email:"suresh.b@bcu.edu.in",status:"active",vpl:false,lastLogin:"2 days ago"},
+  {id:10,name:"Meera Joshi",usn:"1BG23MCA009",dept:"MCA",sem:3,email:"meera.j@bcu.edu.in",status:"suspended",vpl:false,lastLogin:"1 week ago"},
+  {id:11,name:"Arjun Verma",usn:"1BG23BCA018",dept:"BCA",sem:4,email:"arjun.v@bcu.edu.in",status:"pending",vpl:false,lastLogin:"Never"},
+  {id:12,name:"Pooja Iyer",usn:"1BG23MCA011",dept:"MCA",sem:2,email:"pooja.i@bcu.edu.in",status:"active",vpl:true,lastLogin:"Today, 10:20"},
+];
+
+let currentDetailId = null;
+
+/* Avatar colours cycling */
+const AV_COLORS = ["#7c9ef8","#059669","#d97706","#7c3aed","#db2777","#0891b2","#65a30d"];
+function avColor(name){ return AV_COLORS[name.charCodeAt(0)%AV_COLORS.length]; }
+function initials(name){ return name.split(' ').map(p=>p[0]).join('').slice(0,2).toUpperCase(); }
+
+/* ═══════════════════════════════════════════════
+   RENDER TABLE
+═══════════════════════════════════════════════ */
+function renderStudents(list){
+  const tbody = document.getElementById('student-tbody');
+  if(!list.length){
+    tbody.innerHTML = `<tr><td colspan="8" style="text-align:center;padding:2rem;color:var(--muted)">No students match the current filters</td></tr>`;
+    return;
+  }
+  tbody.innerHTML = list.map(s=>`
+    <tr data-id="${s.id}">
+      <td class="check-col"><input type="checkbox" class="row-check" onchange="updateBulk()"></td>
+      <td>
+        <div class="student-meta">
+          <div class="student-avatar" style="background:${avColor(s.name)}">${initials(s.name)}</div>
+          <div>
+            <div class="student-name">${s.name}</div>
+            <div class="student-id">${s.email}</div>
+          </div>
+        </div>
+      </td>
+      <td><div class="student-name">${s.usn}</div><div class="student-id">${s.dept}</div></td>
+      <td><span class="tag">Sem ${s.sem}</span></td>
+      <td><span class="access-badge ${s.status}">${cap(s.status)}</span></td>
+      <td>
+        <label class="toggle-switch">
+          <input type="checkbox" ${s.vpl?'checked':''} onchange="toggleVPL(${s.id},this)">
+          <span class="toggle-knob"></span>
+        </label>
+      </td>
+      <td style="color:var(--muted);font-size:12px">${s.lastLogin}</td>
+      <td>
+        <div style="display:flex;gap:5px">
+          <button class="btn btn-ghost btn-xs" onclick="openDetail(${s.id})">View</button>
+          <button class="btn btn-xs ${s.status==='suspended'?'btn-success':'btn-danger'}" 
+            onclick="quickAction(${s.id},'${s.status==='suspended'?'active':'suspended'}')">
+            ${s.status==='suspended'?'Restore':'Suspend'}
+          </button>
+        </div>
+      </td>
+    </tr>
+  `).join('');
+  document.getElementById('table-foot').textContent = `Showing ${list.length} of ${STUDENTS.length} students`;
+}
+
+function cap(s){ return s.charAt(0).toUpperCase()+s.slice(1); }
+
+/* ═══════════════════════════════════════════════
+   FILTERS
+═══════════════════════════════════════════════ */
+function filterStudents(){
+  const q = document.getElementById('student-search').value.toLowerCase();
+  const st = document.getElementById('status-filter').value;
+  const dept = document.getElementById('dept-filter').value;
+  const list = STUDENTS.filter(s=>{
+    const matchQ = !q || s.name.toLowerCase().includes(q) || s.usn.toLowerCase().includes(q) || s.email.toLowerCase().includes(q);
+    const matchSt = !st || s.status===st;
+    const matchDept = !dept || s.dept===dept;
+    return matchQ && matchSt && matchDept;
+  });
+  renderStudents(list);
+  clearSelection();
+}
+
+function filterStatus(status){
+  document.getElementById('status-filter').value = status;
+  filterStudents();
+}
+
+/* ═══════════════════════════════════════════════
+   BULK SELECTION
+═══════════════════════════════════════════════ */
+function updateBulk(){
+  const checked = document.querySelectorAll('.row-check:checked').length;
+  const bar = document.getElementById('bulk-bar');
+  document.getElementById('bulk-count').textContent = `${checked} student${checked!==1?'s':''} selected`;
+  bar.classList.toggle('visible', checked>0);
+}
+
+function toggleSelectAll(cb){
+  document.querySelectorAll('.row-check').forEach(c=>c.checked=cb.checked);
+  updateBulk();
+}
+
+function clearSelection(){
+  document.querySelectorAll('.row-check, #select-all').forEach(c=>c.checked=false);
+  document.getElementById('bulk-bar').classList.remove('visible');
+}
+
+function bulkAction(action){
+  const ids = [];
+  document.querySelectorAll('.row-check:checked').forEach(cb=>{
+    const row = cb.closest('tr');
+    if(row) ids.push(+row.dataset.id);
+  });
+  ids.forEach(id=>{
+    const s=STUDENTS.find(x=>x.id===id);
+    if(s){
+      s.status = action==='activate'?'active': action==='restrict'?'restricted':'suspended';
+      if(action!=='activate') s.vpl=false;
+    }
+  });
+  updateStats();
+  filterStudents();
+  clearSelection();
+  showToast(`${ids.length} student${ids.length!==1?'s':''} ${action==='activate'?'activated':action+'ed'}`,'success');
+}
+
+/* ═══════════════════════════════════════════════
+   QUICK ACTIONS
+═══════════════════════════════════════════════ */
+function quickAction(id, newStatus){
+  const s=STUDENTS.find(x=>x.id===id);
+  if(!s) return;
+  s.status=newStatus;
+  if(newStatus!=='active') s.vpl=false;
+  updateStats();
+  filterStudents();
+  showToast(`${s.name} — status changed to ${cap(newStatus)}`, newStatus==='active'?'success':'danger');
+}
+
+function toggleVPL(id, el){
+  const s=STUDENTS.find(x=>x.id===id);
+  if(!s) return;
+  if(s.status!=='active' && el.checked){
+    el.checked=false;
+    showToast('Activate the student first before enabling VPL','warn'); return;
+  }
+  s.vpl=el.checked;
+  showToast(`VPL ${el.checked?'enabled':'disabled'} for ${s.name}`, el.checked?'success':'warn');
+}
+
+function updateStats(){
+  document.getElementById('cnt-total').textContent = STUDENTS.length;
+  document.getElementById('cnt-active').textContent = STUDENTS.filter(s=>s.status==='active').length;
+  document.getElementById('cnt-suspended').textContent = STUDENTS.filter(s=>s.status==='suspended').length;
+  document.getElementById('cnt-pending').textContent = STUDENTS.filter(s=>s.status==='pending').length;
+}
+
+/* ═══════════════════════════════════════════════
+   STUDENT DETAIL MODAL
+═══════════════════════════════════════════════ */
+function openDetail(id){
+  const s=STUDENTS.find(x=>x.id===id);
+  if(!s) return;
+  currentDetailId=id;
+  document.getElementById('detail-title').textContent=s.name;
+  document.getElementById('detail-body').innerHTML=`
+    <div style="display:flex;align-items:center;gap:14px;margin-bottom:1.4rem">
+      <div style="width:54px;height:54px;border-radius:50%;background:${avColor(s.name)};color:#fff;display:flex;align-items:center;justify-content:center;font-size:18px;font-weight:700;flex-shrink:0">${initials(s.name)}</div>
+      <div>
+        <div style="font-size:15px;font-weight:700;color:var(--text)">${s.name}</div>
+        <div style="font-size:12px;color:var(--muted)">${s.email}</div>
+        <span class="access-badge ${s.status}" style="margin-top:5px">${cap(s.status)}</span>
+      </div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:1rem">
+      <div class="panel" style="padding:0.9rem">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">USN</div>
+        <div style="font-size:14px;font-weight:600">${s.usn}</div>
+      </div>
+      <div class="panel" style="padding:0.9rem">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);margin-bottom:4px">Programme</div>
+        <div style="font-size:14px;font-weight:600">${s.dept} — Sem ${s.sem}</div>
+      </div>
+    </div>
+    <div class="mini-stat"><span>VPL Lab Access</span><label class="toggle-switch"><input type="checkbox" ${s.vpl?'checked':''} onchange="toggleVPL(${s.id},this)"><span class="toggle-knob"></span></label></div>
+    <div class="mini-stat"><span>Last Login</span><span class="mini-stat-val">${s.lastLogin}</span></div>
+    <div class="modal-field" style="margin-top:1rem">
+      <label class="modal-label">Change Access Status</label>
+      <select class="dash-select" style="width:100%;height:36px" id="detail-status-sel">
+        <option value="active" ${s.status==='active'?'selected':''}>Active</option>
+        <option value="restricted" ${s.status==='restricted'?'selected':''}>Restricted</option>
+        <option value="pending" ${s.status==='pending'?'selected':''}>Pending</option>
+        <option value="suspended" ${s.status==='suspended'?'selected':''}>Suspended</option>
+      </select>
+    </div>
+  `;
+  openModal('student-detail-modal');
+}
+
+function actionFromDetail(status){
+  const sel = document.getElementById('detail-status-sel');
+  const newStatus = sel ? sel.value : status;
+  quickAction(currentDetailId, newStatus);
+  closeModal('student-detail-modal');
+}
+
+/* ═══════════════════════════════════════════════
+   COURSES
+═══════════════════════════════════════════════ */
+const COURSES_MCA = [
+  {icon:"🐍",name:"Python Programming",meta:"Lab + Theory · Sem 1",on:true},
+  {icon:"☕",name:"Java OOP",meta:"Lab + Theory · Sem 2",on:true},
+  {icon:"🗄️",name:"Database Systems",meta:"Lab · Sem 2",on:true},
+  {icon:"🕸️",name:"Web Technologies",meta:"Lab + Theory · Sem 3",on:true},
+  {icon:"🔐",name:"Network Security",meta:"Theory · Sem 4",on:true},
+];
+const COURSES_BCA = [
+  {icon:"💻",name:"C Programming",meta:"Lab + Theory · Sem 1",on:true},
+  {icon:"🌐",name:"Internet Technologies",meta:"Theory · Sem 3",on:false},
+  {icon:"📊",name:"Data Structures",meta:"Lab · Sem 2",on:true},
+  {icon:"🐍",name:"Python Basics",meta:"Lab · Sem 3",on:false},
+  {icon:"📱",name:"Android Development",meta:"Elective · Sem 5",on:true},
+];
+const VPL_LABS = [
+  {icon:"🐍",name:"Python Lab",meta:"25 programs · 5 categories",on:true},
+  {icon:"☕",name:"Java Lab",meta:"15 programs",on:true},
+  {icon:"⚙️",name:"C/C++ Lab",meta:"20 programs",on:true},
+  {icon:"🌐",name:"Web Dev Lab",meta:"Node.js · 10 programs",on:true},
+  {icon:"🔧",name:"Bash Scripting Lab",meta:"Shell · 8 programs",on:false},
+];
+const ROADMAPS = [
+  {icon:"🔐",name:"Cybersecurity Track",meta:"12 milestones",on:true},
+  {icon:"🤖",name:"AI / ML Track",meta:"15 milestones",on:true},
+  {icon:"☁️",name:"Cloud & DevOps Track",meta:"11 milestones",on:true},
+  {icon:"🌐",name:"Full Stack Web Track",meta:"14 milestones",on:true},
+  {icon:"📱",name:"Mobile Development",meta:"10 milestones",on:true},
+  {icon:"🎓",name:"Lecturer / Academic",meta:"UGC NET, GATE, KSET",on:false},
+];
+
+function renderCourseList(containerId, courses){
+  document.getElementById(containerId).innerHTML = courses.map((c,i)=>`
+    <div class="course-row">
+      <div class="course-icon">${c.icon}</div>
+      <div class="course-info">
+        <div class="course-name">${c.name}</div>
+        <div class="course-meta">${c.meta}</div>
+      </div>
+      <label class="toggle-switch">
+        <input type="checkbox" ${c.on?'checked':''} onchange="showToast('${c.name} ${c.on?'disabled':'enabled'}','${c.on?'warn':'success'}');this.closest('label').previousElementSibling.style.opacity=this.checked?1:0.4">
+        <span class="toggle-knob"></span>
+      </label>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════════
+   REPORTS
+═══════════════════════════════════════════════ */
+const ENGAGEMENT = [
+  {label:"Virtual Programming Lab",val:88,color:"var(--accent)"},
+  {label:"Study Materials",val:74,color:"var(--info)"},
+  {label:"Career Roadmaps",val:61,color:"var(--success)"},
+  {label:"Assignments",val:55,color:"var(--warn)"},
+  {label:"Live Sessions",val:42,color:"var(--danger)"},
+];
+
+function renderEngagement(){
+  document.getElementById('engagement-bars').innerHTML = ENGAGEMENT.map(e=>`
+    <div class="prog-row">
+      <div class="prog-label"><strong>${e.label}</strong><span>${e.val}%</span></div>
+      <div class="prog-bar"><div class="prog-fill" style="width:${e.val}%;background:${e.color}"></div></div>
+    </div>
+  `).join('');
+}
+
+const AUDIT = [
+  {type:"danger",icon:"🚫",msg:"<strong>Rohit Kumar</strong> account suspended by admin",time:"Today 10:30"},
+  {type:"success",icon:"✅",msg:"<strong>Divya Nair</strong> new registration approved",time:"Today 09:15"},
+  {type:"warn",icon:"⚠️",msg:"<strong>Sneha Patel</strong> VPL access revoked (restriction)",time:"Yesterday 16:42"},
+  {type:"info",icon:"ℹ️",msg:"<strong>5 students</strong> bulk-enrolled in Python Lab",time:"Yesterday 14:00"},
+  {type:"danger",icon:"🔐",msg:"<strong>Meera Joshi</strong> account suspended — policy violation",time:"Jun 8, 11:20"},
+  {type:"success",icon:"👤",msg:"<strong>Arjun Verma</strong> registration pending admin approval",time:"Jun 7, 09:05"},
+];
+
+function renderAuditLog(){
+  document.getElementById('audit-log').innerHTML = AUDIT.map(a=>`
+    <div class="log-item">
+      <div class="log-icon ${a.type}">${a.icon}</div>
+      <div class="log-body">
+        <div class="log-msg">${a.msg}</div>
+        <div class="log-time">${a.time}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+/* ═══════════════════════════════════════════════
+   MODAL HELPERS
+═══════════════════════════════════════════════ */
+function openModal(id){ document.getElementById(id).classList.add('open'); }
+function closeModal(id){ document.getElementById(id).classList.remove('open'); }
+function modalBgClose(e,el){ if(e.target===el) el.classList.remove('open'); }
+function confirmDanger(){ openModal('danger-modal'); }
+
+function addStudentFromModal(){
+  showToast('Student added successfully','success');
+  closeModal('add-student-modal');
+}
+
+/* ═══════════════════════════════════════════════
+   SECTION SWITCHING
+═══════════════════════════════════════════════ */
+function switchSection(name, tabEl){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.getElementById('sec-'+name).classList.add('active');
+  if(tabEl){
+    document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
+    tabEl.classList.add('active');
+  }
+}
+
+function setSideActive(el){
+  document.querySelectorAll('.side-item').forEach(i=>i.classList.remove('active'));
+  el.classList.add('active');
+}
+
+/* ═══════════════════════════════════════════════
+   THEME
+═══════════════════════════════════════════════ */
+function toggleTheme(){
+  const isDark = document.documentElement.getAttribute('data-theme')==='dark';
+  document.documentElement.setAttribute('data-theme', isDark?'light':'dark');
+  localStorage.setItem('bcu-theme', isDark?'light':'dark');
+  const icon = document.getElementById('theme-icon');
+  icon.innerHTML = isDark
+    ? '<path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/>'
+    : '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+function showToast(msg, type=''){
+  const wrap = document.getElementById('toast-wrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<span>${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(()=>{
+    t.classList.add('removing');
+    setTimeout(()=>t.remove(), 300);
+  }, 3000);
+}
+
+/* ═══════════════════════════════════════════════
+   INIT
+═══════════════════════════════════════════════ */
+(function init(){
+  // Theme
+  const saved = localStorage.getItem('bcu-theme');
+  if(saved) document.documentElement.setAttribute('data-theme', saved);
+
+  // Students
+  renderStudents(STUDENTS);
+  updateStats();
+
+  // Courses
+  renderCourseList('course-list-mca', COURSES_MCA);
+  renderCourseList('course-list-bca', COURSES_BCA);
+  renderCourseList('vpl-list', VPL_LABS);
+  renderCourseList('roadmap-list', ROADMAPS);
+
+  // Reports
+  renderEngagement();
+  renderAuditLog();
+})();
+</script>
+</body>
+</html>

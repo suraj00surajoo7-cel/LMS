@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>BCU LMS — Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet" />
+<style>
+  :root {
+    --bg: #f4f4f4;
+    --card: #ffffff;
+    --accent: #1a1a1a;
+    --accent2: #444444;
+    --text: #111111;
+    --muted: #888888;
+    --border: #e0e0e0;
+    --input-bg: #fafafa;
+    --input-border: #d4d4d4;
+    --radius: 16px;
+    --radius-sm: 10px;
+    --shadow: 0 8px 40px rgba(0,0,0,0.10);
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    height: 100%;
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0; z-index: 0;
+    background-image:
+      linear-gradient(rgba(0,0,0,0.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(0,0,0,0.04) 1px, transparent 1px);
+    background-size: 40px 40px;
+    pointer-events: none;
+  }
+
+  .page-wrap {
+    position: relative; z-index: 1;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 5rem 1rem 2rem;
+  }
+
+  .top-bar {
+    position: fixed; top: 0; left: 0; right: 0;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 2.5rem;
+    height: 60px;
+    background: rgba(255,255,255,0.95);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--border);
+    z-index: 10;
+  }
+
+  .brand { display: flex; align-items: center; gap: 10px; }
+  .brand-mark {
+    width: 36px; height: 36px;
+    background: var(--accent);
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 800; color: #fff;
+    letter-spacing: 0.5px; flex-shrink: 0;
+  }
+  .brand-name { font-size: 14px; font-weight: 600; color: var(--text); letter-spacing: 0.2px; }
+
+  .top-links { display: flex; gap: 2rem; font-size: 13px; }
+  .top-links a { text-decoration: none; color: var(--muted); cursor: pointer; transition: color 0.2s; }
+  .top-links a:hover { color: var(--text); }
+
+  .card {
+    width: 100%;
+    max-width: 430px;
+    background: var(--card);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 1px solid var(--border);
+    padding: 2.4rem 2.2rem 2rem;
+    animation: fadeUp 0.7s cubic-bezier(0.22,1,0.36,1) both;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(24px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  .mode-switcher {
+    display: flex;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 4px; gap: 4px;
+    margin-bottom: 2rem;
+  }
+
+  .mode-btn {
+    flex: 1; padding: 9px 0;
+    font-size: 13px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    color: var(--muted);
+    background: none; border: none;
+    border-radius: 7px;
+    cursor: pointer;
+    transition: all 0.22s;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .mode-btn.active { background: var(--accent); color: #fff; box-shadow: 0 2px 12px rgba(0,0,0,0.18); }
+
+  .card-header { margin-bottom: 1.6rem; }
+  .card-title {
+    font-family: 'DM Serif Display', serif;
+    font-size: 28px; color: var(--text);
+    margin-bottom: 0.3rem; line-height: 1.2;
+  }
+  .card-sub { font-size: 13px; color: var(--muted); line-height: 1.55; }
+
+  .field { margin-bottom: 1.1rem; }
+  .field-label {
+    display: block; font-size: 11px; font-weight: 600;
+    letter-spacing: 1.3px; text-transform: uppercase;
+    color: var(--muted); margin-bottom: 7px;
+  }
+  .input-wrap { position: relative; }
+  .input-icon {
+    position: absolute; left: 13px; top: 50%;
+    transform: translateY(-50%); color: var(--muted);
+    transition: color 0.2s; pointer-events: none;
+  }
+
+  .field-input {
+    width: 100%; height: 46px;
+    background: var(--input-bg);
+    border: 1px solid var(--input-border);
+    border-radius: var(--radius-sm);
+    padding: 0 14px 0 40px;
+    font-size: 14px; font-family: 'DM Sans', sans-serif;
+    color: var(--text); outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+  .field-input.no-icon { padding-left: 14px; }
+  .field-input::placeholder { color: #bbb; }
+  .field-input:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(0,0,0,0.08); background: #fff; }
+
+  select.field-input {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23888' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat; background-position: right 13px center;
+    cursor: pointer;
+  }
+
+  .pw-toggle {
+    position: absolute; right: 13px; top: 50%;
+    transform: translateY(-50%);
+    background: none; border: none; color: var(--muted);
+    cursor: pointer; padding: 0; transition: color 0.2s;
+  }
+  .pw-toggle:hover { color: var(--accent); }
+
+  .field-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 7px; }
+  .forgot-link { font-size: 12px; color: var(--muted); text-decoration: none; cursor: pointer; transition: color 0.2s; }
+  .forgot-link:hover { color: var(--text); text-decoration: underline; }
+
+  .field-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .check-row { display: flex; align-items: center; gap: 8px; margin-bottom: 1.2rem; }
+  .check-row input[type=checkbox] { width: 16px; height: 16px; accent-color: var(--accent); cursor: pointer; }
+  .check-row label { font-size: 12.5px; color: var(--muted); cursor: pointer; }
+
+  .section-label {
+    font-size: 10px; font-weight: 600; letter-spacing: 2px;
+    text-transform: uppercase; color: #bbb;
+    margin: 1.2rem 0 0.8rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .btn-primary {
+    width: 100%; height: 48px;
+    background: var(--accent); color: #fff; border: none;
+    border-radius: var(--radius-sm);
+    font-size: 14px; font-weight: 600;
+    font-family: 'DM Sans', sans-serif;
+    letter-spacing: 1px; text-transform: uppercase;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: background 0.22s, transform 0.15s, box-shadow 0.22s;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.18);
+    margin-bottom: 1.3rem; position: relative; overflow: hidden;
+  }
+  .btn-primary:hover { background: #333; box-shadow: 0 6px 24px rgba(0,0,0,0.28); }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .spinner {
+    display: none; width: 16px; height: 16px;
+    border: 2px solid rgba(255,255,255,0.3);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  .divider {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 1.1rem;
+    color: var(--muted); font-size: 11.5px;
+    letter-spacing: 1px; text-transform: uppercase;
+  }
+  .divider::before, .divider::after { content: ''; flex: 1; height: 1px; background: var(--border); }
+
+  .social-row { display: flex; justify-content: center; gap: 14px; margin-bottom: 1.3rem; }
+
+  .social-icon-btn {
+    width: 50px; height: 50px; border-radius: 50%;
+    background: var(--input-bg); border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: border-color 0.2s, background 0.2s, transform 0.15s, box-shadow 0.2s;
+  }
+  .social-icon-btn:hover { border-color: #999; background: #fff; transform: translateY(-2px); box-shadow: 0 4px 14px rgba(0,0,0,0.12); }
+  .social-icon-btn svg { width: 22px; height: 22px; flex-shrink: 0; }
+
+  .toast {
+    display: none; align-items: center; gap: 10px;
+    background: #fff3f3; border: 1px solid #f0c0c0;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px; font-size: 13px; color: #c0392b;
+    margin-bottom: 1rem; animation: toastIn 0.3s ease;
+  }
+  .toast.success { background: #f0fff4; border-color: #a8e6c0; color: #276749; }
+  .toast.show { display: flex; }
+  @keyframes toastIn { from { opacity: 0; transform: translateY(-6px); } to { opacity: 1; transform: translateY(0); } }
+
+  .secure-note { text-align: center; font-size: 11.5px; color: #bbb; font-style: italic; margin-top: 0.2rem; }
+  .page-footer { margin-top: 1.4rem; font-size: 11.5px; color: #bbb; letter-spacing: 1.5px; text-transform: uppercase; text-align: center; }
+
+  .form-panel { display: none; }
+  .form-panel.active { display: block; }
+
+  @media (max-width: 480px) {
+    .top-links { display: none; }
+    .card { padding: 1.8rem 1.3rem 1.6rem; }
+    .field-row-2 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <a class="brand" href="home.html" style="text-decoration:none;">
+    <div class="brand-mark">BCU</div>
+    <span class="brand-name">Bengaluru City University</span>
+  </div>
+  <div class="top-links">
+    <a>Home</a>
+    <a>Learners</a>
+    <a>Official Site</a>
+  </div>
+</div>
+
+<div class="page-wrap">
+  <div class="card">
+
+    <div class="mode-switcher">
+      <button class="mode-btn active" onclick="switchMode('login', this)">Login</button>
+      <button class="mode-btn" onclick="switchMode('register', this)">Register</button>
+    </div>
+
+    <!-- LOGIN -->
+    <div id="panel-login" class="form-panel active">
+      <div class="card-header">
+        <h2 class="card-title">Welcome back</h2>
+        <p class="card-sub">Enter your credentials to access the BCU Learning Management System.</p>
+      </div>
+
+      <div class="toast" id="toast-login">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="toast-login-msg"></span>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Username</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input class="field-input" type="text" id="login-uname" placeholder="Enter your username" />
+        </div>
+      </div>
+
+      <div class="field">
+        <div class="field-row">
+          <label class="field-label">Password</label>
+          <a class="forgot-link">Forgot?</a>
+        </div>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input class="field-input" type="password" id="login-pw" placeholder="••••••••" />
+          <button class="pw-toggle" onclick="togglePw('login-pw',this)" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="check-row">
+        <input type="checkbox" id="rem-login" />
+        <label for="rem-login">Remember me for 30 days</label>
+      </div>
+
+      <button class="btn-primary" onclick="doLogin()">
+        <span>Log In</span>
+        <div class="spinner" id="sp-login"></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+
+      <div class="divider">or continue with</div>
+
+      <div class="social-row">
+        <!-- Google -->
+        <button class="social-icon-btn" onclick="socialLogin('Google')" title="Google">
+          <svg viewBox="0 0 24 24">
+            <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+            <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+            <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l3.66-2.84z" fill="#FBBC05"/>
+            <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+          </svg>
+        </button>
+        <!-- Facebook -->
+        <button class="social-icon-btn" onclick="socialLogin('Facebook')" title="Facebook">
+          <svg viewBox="0 0 24 24" fill="#1877F2">
+            <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+          </svg>
+        </button>
+        <!-- LinkedIn -->
+        <button class="social-icon-btn" onclick="socialLogin('LinkedIn')" title="LinkedIn">
+          <svg viewBox="0 0 24 24" fill="#0A66C2">
+            <path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/>
+          </svg>
+        </button>
+      </div>
+
+      <p class="secure-note">Secure portal for authorized personnel only.</p>
+    </div>
+
+    <!-- REGISTER -->
+    <div id="panel-register" class="form-panel">
+      <div class="card-header">
+        <h2 class="card-title">Student Registration</h2>
+        <p class="card-sub">Create your BCU LMS account. Fill in all details carefully.</p>
+      </div>
+
+      <div class="toast" id="toast-reg">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <span id="toast-reg-msg"></span>
+      </div>
+
+      <p class="section-label">Personal Details</p>
+
+      <div class="field">
+        <label class="field-label">Full Name</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input class="field-input" type="text" id="reg-name" placeholder="Your full name" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Email Address</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="2" y="4" width="20" height="16" rx="2"/><path d="M2 7l10 7 10-7"/></svg>
+          <input class="field-input" type="email" id="reg-email" placeholder="you@university.edu" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Mobile Number</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+          <input class="field-input" type="tel" id="reg-mobile" placeholder="+91 98765 43210" />
+        </div>
+      </div>
+
+      <p class="section-label">Academic Details</p>
+
+      <div class="field">
+        <label class="field-label">UUCMS Number</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 8h10M7 12h6"/></svg>
+          <input class="field-input" type="text" id="reg-uucms" placeholder="e.g. UUCMS2024001" />
+        </div>
+      </div>
+
+      <div class="field-row-2">
+        <div class="field">
+          <label class="field-label">Year</label>
+          <select class="field-input no-icon" id="reg-year">
+            <option value="" disabled selected>Select Year</option>
+            <option value="1">1st Year</option>
+            <option value="2">2nd Year</option>
+            <option value="3">3rd Year</option>
+            <option value="4">4th Year</option>
+          </select>
+        </div>
+        <div class="field">
+          <label class="field-label">Semester</label>
+          <select class="field-input no-icon" id="reg-sem">
+            <option value="" disabled selected>Select Sem</option>
+            <option value="1">Semester 1</option>
+            <option value="2">Semester 2</option>
+            <option value="3">Semester 3</option>
+            <option value="4">Semester 4</option>
+            <option value="5">Semester 5</option>
+            <option value="6">Semester 6</option>
+            <option value="7">Semester 7</option>
+            <option value="8">Semester 8</option>
+          </select>
+        </div>
+      </div>
+
+      <p class="section-label">Account Details</p>
+
+      <div class="field">
+        <label class="field-label">Username</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          <input class="field-input" type="text" id="reg-uname" placeholder="Choose a username" />
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Password</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input class="field-input" type="password" id="reg-pw" placeholder="Min. 6 characters" />
+          <button class="pw-toggle" onclick="togglePw('reg-pw',this)" type="button">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="17" height="17"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="field">
+        <label class="field-label">Confirm Password</label>
+        <div class="input-wrap">
+          <svg class="input-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" width="18" height="18"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
+          <input class="field-input" type="password" id="reg-pw2" placeholder="Repeat password" />
+        </div>
+      </div>
+
+      <button class="btn-primary" onclick="doRegister()" style="margin-top: 0.8rem;">
+        <span>Create Account</span>
+        <div class="spinner" id="sp-reg"></div>
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+      </button>
+
+      <p class="secure-note">Secure portal for authorized personnel only.</p>
+    </div>
+
+  </div>
+  <p class="page-footer">© 2026 BCU Education Systems</p>
+</div>
+
+<script>
+  /* ── Config ─────────────────────────────────────────────────── */
+  const API = "http://localhost:5000/api";
+
+  /* ── UI helpers ─────────────────────────────────────────────── */
+  function switchMode(mode, btn) {
+    document.querySelectorAll('.form-panel').forEach(p => p.classList.remove('active'));
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    document.getElementById('panel-' + mode).classList.add('active');
+    btn.classList.add('active');
+  }
+
+  function togglePw(id, btn) {
+    const inp = document.getElementById(id);
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    btn.style.color = inp.type === 'text' ? '#111' : '';
+  }
+
+  function showToast(toastId, msgId, msg, success) {
+    const t = document.getElementById(toastId);
+    document.getElementById(msgId).textContent = msg;
+    t.className = 'toast show' + (success ? ' success' : '');
+    clearTimeout(t._timer);
+    t._timer = setTimeout(() => t.classList.remove('show'), 3500);
+  }
+
+  function setSpinner(id, visible) {
+    document.getElementById(id).style.display = visible ? 'block' : 'none';
+  }
+
+  /* ── Login ──────────────────────────────────────────────────── */
+  async function doLogin() {
+    const username  = document.getElementById('login-uname').value.trim();
+    const password  = document.getElementById('login-pw').value;
+
+    if (username.length < 3) {
+      showToast('toast-login','toast-login-msg','Username must be at least 3 characters.', false); return;
+    }
+    if (password.length < 4) {
+      showToast('toast-login','toast-login-msg','Password must be at least 4 characters.', false); return;
+    }
+
+    setSpinner('sp-login', true);
+    try {
+      const res  = await fetch(`${API}/login`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username, password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('toast-login','toast-login-msg', data.message, true);
+        // Store basic user info for the dashboard
+        sessionStorage.setItem('lms_user', JSON.stringify(data.data));
+        setTimeout(() => { window.location.href = 'Dashboard.html'; }, 1200);
+      } else {
+        showToast('toast-login','toast-login-msg', data.message, false);
+      }
+    } catch (e) {
+      showToast('toast-login','toast-login-msg','Cannot reach server. Is the backend running?', false);
+    } finally {
+      setSpinner('sp-login', false);
+    }
+  }
+
+  /* ── Register ───────────────────────────────────────────────── */
+  async function doRegister() {
+    const name             = document.getElementById('reg-name').value.trim();
+    const email            = document.getElementById('reg-email').value.trim();
+    const mobile           = document.getElementById('reg-mobile').value.trim();
+    const uucms            = document.getElementById('reg-uucms').value.trim();
+    const year             = document.getElementById('reg-year').value;
+    const sem              = document.getElementById('reg-sem').value;
+    const username         = document.getElementById('reg-uname').value.trim();
+    const password         = document.getElementById('reg-pw').value;
+    const confirm_password = document.getElementById('reg-pw2').value;
+
+    // Client-side pre-checks (server validates again)
+    if (!name)                        { showToast('toast-reg','toast-reg-msg','Please enter your full name.', false); return; }
+    if (!email.includes('@'))         { showToast('toast-reg','toast-reg-msg','Please enter a valid email address.', false); return; }
+    if (mobile.replace(/\D/g,'').length < 10) { showToast('toast-reg','toast-reg-msg','Please enter a valid 10-digit mobile number.', false); return; }
+    if (uucms.length < 5)             { showToast('toast-reg','toast-reg-msg','Please enter a valid UUCMS number.', false); return; }
+    if (!year)                        { showToast('toast-reg','toast-reg-msg','Please select your year.', false); return; }
+    if (!sem)                         { showToast('toast-reg','toast-reg-msg','Please select your semester.', false); return; }
+    if (username.length < 3)          { showToast('toast-reg','toast-reg-msg','Username must be at least 3 characters.', false); return; }
+    if (password.length < 6)          { showToast('toast-reg','toast-reg-msg','Password must be at least 6 characters.', false); return; }
+    if (password !== confirm_password){ showToast('toast-reg','toast-reg-msg','Passwords do not match.', false); return; }
+
+    setSpinner('sp-reg', true);
+    try {
+      const res  = await fetch(`${API}/register`, {
+        method: 'POST',
+        credentials: 'include',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name, email, mobile, uucms, year, sem, username, password, confirm_password })
+      });
+      const data = await res.json();
+      if (data.success) {
+        showToast('toast-reg','toast-reg-msg', data.message, true);
+        setTimeout(() => document.querySelector('.mode-btn').click(), 1800);
+      } else {
+        showToast('toast-reg','toast-reg-msg', data.message, false);
+      }
+    } catch (e) {
+      showToast('toast-reg','toast-reg-msg','Cannot reach server. Is the backend running?', false);
+    } finally {
+      setSpinner('sp-reg', false);
+    }
+  }
+
+  function socialLogin(provider) {
+    showToast('toast-login','toast-login-msg','Social login coming soon.', false);
+  }
+</script>
+</body>
+</html>
